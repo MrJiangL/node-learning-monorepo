@@ -1,0 +1,48 @@
+{
+  "name": "@learn/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "smoke:api": "tsx src/scripts/api-smoke.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "lab:zod": "vitest run --config vitest.lab.config.ts",
+    "lab:difficulty": "vitest run --config vitest.lab.config.ts labs/difficulty-feature.test.ts",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "prisma generate --config ../../prisma.config.ts",
+    "prisma:migrate": "prisma migrate dev --config ../../prisma.config.ts",
+    "openapi:schema-lab": "tsx src/scripts/openapi-schema-lab.ts",
+    "redis:ping": "tsx src/scripts/redis-ping.ts",
+    "db:explain:activity-logs": "tsx src/scripts/explain-activity-log-query.ts",
+    "db:seed:activity-log-explain": "tsx src/scripts/seed-activity-log-explain-data.ts",
+    "db:lab:lost-update": "tsx src/scripts/concurrent-lost-update-lab.ts",
+    "db:lab:atomic-increment": "tsx src/scripts/concurrent-atomic-increment-lab.ts",
+    "db:lab:transaction-boundary": "tsx src/scripts/transaction-job-log-boundary-lab.ts",
+    "db:lab:row-lock": "tsx src/scripts/row-lock-for-update-lab.ts"
+  },
+  "dependencies": {
+    "@learn/shared": "file:../../packages/shared",
+    "@prisma/adapter-mariadb": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "dotenv": "^17.4.2",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.3",
+    "redis": "^6.0.0",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^3.25.7",
+    "zod-to-json-schema": "^3.25.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/supertest": "^6.0.3",
+    "@types/swagger-ui-express": "^4.1.8",
+    "prisma": "^7.8.0",
+    "supertest": "^7.1.1",
+    "tsx": "^4.19.4"
+  }
+}
