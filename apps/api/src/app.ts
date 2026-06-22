@@ -1,7 +1,7 @@
 import express from "express";
 import { errorHandler } from "./middleware/error-handler.js";
 import { notFound } from "./middleware/not-found.js";
-import { healthRouter } from "./modules/health/health.routes.js";
+import { createHealthRouter, type ReadinessCheck } from "./modules/health/health.routes.js";
 import { createPlansRouter } from "./modules/plans/plans.routes.js";
 import { createAuthRouter } from "./modules/auth/auth.routes.js";
 import { createRequestLogger } from "./middleware/request-logger.js";
@@ -17,6 +17,7 @@ import { createActivityLogsRouter } from "./modules/activity-logs/activity-logs.
 export type CreateAppOptions = {
   projectCacheClient?: RedisClientType;
   jobQueue?: JobRepository;
+  readinessCheck?: ReadinessCheck;
 };
 // createApp 只负责“组装 Express 应用”，不直接 listen 端口。
 //
@@ -51,7 +52,11 @@ export function createApp(options: CreateAppOptions = {}) {
   // 路由注册顺序很重要。
   // Express 会从上到下匹配中间件和路由，匹配到了就执行。
   // 这里把业务路由放在前面，让 /health 和 /plans 先有机会处理请求。
-  app.use("/health", healthRouter);
+  app.use(
+    createHealthRouter({
+      readinessCheck: options.readinessCheck
+    })
+  );
 
   // createPlansRouter() 是一个路由工厂，不是共享的单例 router。
   // 因为 plans 目前使用内存 repository，每次 createApp() 都应该得到一份新的数据容器。

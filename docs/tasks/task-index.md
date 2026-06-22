@@ -199,18 +199,26 @@ Task 5: Prisma Persistence With MySQL
 - 事务和并发阶段复盘：`docs/tasks/2026-06-21-transaction-concurrency-stage-retrospective.md`
 - 后端生产化下一阶段选择：`docs/tasks/2026-06-21-next-backend-production-stage-planning.md`
 - GitHub Actions CI 入门：`docs/tasks/2026-06-21-github-actions-ci-intro.md`
+- CI 结果复盘和优化：`docs/tasks/2026-06-21-ci-result-retrospective.md`
+- 部署前环境变量盘点：`docs/tasks/2026-06-22-deployment-env-inventory.md`
+- 部署方式选择：托管平台还是自管服务器：`docs/tasks/2026-06-22-deployment-platform-choice.md`
+- Railway API 第一版部署准备：`docs/tasks/2026-06-22-railway-api-deploy-prep.md`
+- Railway API 首次部署：`docs/tasks/2026-06-22-railway-api-first-deploy.md`
+- Railway 线上 API Smoke 验证：`docs/tasks/2026-06-22-railway-api-smoke.md`
+- API 部署日志和故障复盘：`docs/tasks/2026-06-22-railway-deploy-log-retrospective.md`
+- 生产化日志、监控和健康检查规划：`docs/tasks/2026-06-22-production-observability-plan.md`
+- 实现 `/ready` 数据库 Readiness Check：`docs/tasks/2026-06-22-ready-check.md`
 
 ## Current
 
-- CI 结果复盘和优化：`docs/tasks/2026-06-21-ci-result-retrospective.md`
+- 增强 Error Handler 服务端日志：`docs/tasks/2026-06-22-error-handler-server-logging.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. CI 结果复盘和优化
-2. 部署和环境变量管理
-3. 生产化日志、监控和健康检查
+1. 增强 error handler 服务端日志
+2. 前端线上接入 API
 
 ## Working Agreement
 

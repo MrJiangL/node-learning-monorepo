@@ -61,6 +61,51 @@ describe("GET /health", () => {
     });
   });
 
+  it("returns ready status when the database readiness check succeeds", async () => {
+    const app = createApp({
+      readinessCheck: async () => {
+        // 这里模拟数据库检查成功。
+        //
+        // 真正生产环境里，readinessCheck 会执行一个轻量数据库查询。
+      }
+    });
+
+    const response = await request(app).get("/ready");
+
+    expect(response.status).toBe(200);
+    expect(response.body).toEqual({
+      success: true,
+      data: {
+        status: "ready",
+        service: "node-learning-api",
+        dependencies: {
+          database: "ok"
+        }
+      }
+    });
+  });
+
+  it("returns 503 without leaking database details when the readiness check fails", async () => {
+    const app = createApp({
+      readinessCheck: async () => {
+        throw new Error("mysql://root:secret@db.example.com:3306/node_learning failed");
+      }
+    });
+
+    const response = await request(app).get("/ready");
+
+    expect(response.status).toBe(503);
+    expect(response.body).toEqual({
+      success: false,
+      error: {
+        code: "SERVICE_UNAVAILABLE",
+        message: "Service is not ready"
+      }
+    });
+    expect(JSON.stringify(response.body)).not.toContain("secret");
+    expect(JSON.stringify(response.body)).not.toContain("db.example.com");
+  });
+
   it("returns a JSON 404 for unknown routes", async () => {
     const app = createApp();
 
