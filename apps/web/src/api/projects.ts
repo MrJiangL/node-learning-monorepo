@@ -1,4 +1,5 @@
 import type { CreateProjectInput, PaginatedResult, Project } from "@learn/shared";
+import { buildApiUrl } from "./api-url";
 import { parseApiError } from "./api-error";
 import { authenticatedFetch } from "./authenticated-fetch.ts";
 
@@ -17,7 +18,7 @@ export async function fetchProjects(token: string): Promise<ListProjectsResponse
   // /api/projects 会由 Vite proxy 转发到后端 /projects。
   //
   // 这个接口受 requireAuth 保护，所以必须带 Authorization header。
-  const response = await authenticatedFetch("/api/projects", {
+  const response = await authenticatedFetch(buildApiUrl("/projects"), {
     headers: {
       // Bearer token 是后端 requireAuth 当前支持的格式。
       //
@@ -41,7 +42,7 @@ export async function createProject(
   //
   // userId 不从前端传，后端会从 JWT token 里解析当前用户。
   // 这就是“身份由服务端确认，不相信客户端自报 userId”。
-  const response = await authenticatedFetch("/api/projects", {
+  const response = await authenticatedFetch(buildApiUrl("/projects"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

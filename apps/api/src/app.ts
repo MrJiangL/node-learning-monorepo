@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { errorHandler } from "./middleware/error-handler.js";
 import { notFound } from "./middleware/not-found.js";
 import { createHealthRouter, type ReadinessCheck } from "./modules/health/health.routes.js";
@@ -18,6 +19,7 @@ export type CreateAppOptions = {
   projectCacheClient?: RedisClientType;
   jobQueue?: JobRepository;
   readinessCheck?: ReadinessCheck;
+  corsOrigin?: string;
 };
 // createApp 只负责“组装 Express 应用”，不直接 listen 端口。
 //
@@ -26,6 +28,15 @@ export type CreateAppOptions = {
 // 2. 测试可以直接拿 createApp() 生成一个 app，不需要真的占用 3001 端口。
 export function createApp(options: CreateAppOptions = {}) {
   const app = express();
+  const corsOrigin = options.corsOrigin ?? env.CORS_ORIGIN;
+
+  if (corsOrigin) {
+    app.use(
+      cors({
+        origin: corsOrigin
+      })
+    );
+  }
 
   // requestLogger 要尽量靠前注册。
   //

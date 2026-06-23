@@ -38,6 +38,7 @@ const envSchema = z.object({
   // - development：本地开发时保留请求日志。
   // - production：生产环境可以再接入更正式的日志系统。
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+  CORS_ORIGIN: z.string().trim().min(1).optional(),
   JOB_WORKER_ENABLED: z
     .enum(["true", "false"])
     .default("false")

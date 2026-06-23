@@ -1,4 +1,5 @@
 import type { AuthTokenResult, LoginUserInput } from "@learn/shared";
+import { buildApiUrl } from "./api-url";
 import { parseApiError } from "./api-error";
 
 export type LoginResponse = {
@@ -20,7 +21,7 @@ export async function loginUser(input: LoginUserInput): Promise<LoginResponse> {
   //
   // 现在页面在首页时两者看起来都能用，但以后如果路由变成 /projects，
   // 相对路径就可能变成 /projects/api/auth/login，容易埋 bug。
-  const response = await fetch("/api/auth/login", {
+  const response = await fetch(buildApiUrl("/auth/login"), {
     method: "POST",
     headers: {
       // HTTP 请求头名字必须是 Content-Type。
@@ -43,7 +44,7 @@ export async function loginUser(input: LoginUserInput): Promise<LoginResponse> {
 }
 
 export async function refreshAuthToken(refreshToken: string): Promise<RefreshTokenResponse> {
-  const response = await fetch("/api/auth/refresh", {
+  const response = await fetch(buildApiUrl("/auth/refresh"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json"

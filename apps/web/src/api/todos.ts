@@ -1,4 +1,5 @@
 import type { CreateTodoInput, PaginatedResult, Todo, UpdateTodoInput } from "@learn/shared";
+import { buildApiUrl } from "./api-url";
 import { parseApiError } from "./api-error";
 import { authenticatedFetch } from "./authenticated-fetch.ts";
 
@@ -25,7 +26,7 @@ export async function fetchTodos(projectId: string, token: string): Promise<List
   // /projects/:projectId/todos
   //
   // 后端 service 会继续校验这个 Project 是否属于当前登录用户。
-  const response = await authenticatedFetch(`/api/projects/${projectId}/todos`, {
+  const response = await authenticatedFetch(buildApiUrl(`/projects/${projectId}/todos`), {
     headers: {
       Authorization: `Bearer ${token}`
     }
@@ -43,7 +44,7 @@ export async function createTodo(
   token: string,
   input: CreateTodoInput
 ): Promise<CreateTodoResponse> {
-  const response = await authenticatedFetch(`/api/projects/${projectId}/todos`, {
+  const response = await authenticatedFetch(buildApiUrl(`/projects/${projectId}/todos`), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -68,7 +69,7 @@ export async function updateTodo(
   //
   // 这里我们只传 { completed: true/false }，
   // 后端会只更新 completed，不会覆盖 title / dueDate 等其他字段。
-  const response = await authenticatedFetch(`/api/todos/${todoId}`, {
+  const response = await authenticatedFetch(buildApiUrl(`/todos/${todoId}`), {
     method: "PATCH",
     headers: {
       "Content-Type": "application/json",
@@ -89,7 +90,7 @@ export async function deleteTodo(todoId: string, token: string): Promise<void> {
   //
   // 后端成功时返回 204 No Content。
   // 204 的意思是“成功，但没有响应体”，所以这里不需要 response.json()。
-  const response = await authenticatedFetch(`/api/todos/${todoId}`, {
+  const response = await authenticatedFetch(buildApiUrl(`/todos/${todoId}`), {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`
