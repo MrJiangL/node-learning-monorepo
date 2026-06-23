@@ -208,17 +208,18 @@ Task 5: Prisma Persistence With MySQL
 - API 部署日志和故障复盘：`docs/tasks/2026-06-22-railway-deploy-log-retrospective.md`
 - 生产化日志、监控和健康检查规划：`docs/tasks/2026-06-22-production-observability-plan.md`
 - 实现 `/ready` 数据库 Readiness Check：`docs/tasks/2026-06-22-ready-check.md`
+- 增强 Error Handler 服务端日志：`docs/tasks/2026-06-22-error-handler-server-logging.md`
 
 ## Current
 
-- 增强 Error Handler 服务端日志：`docs/tasks/2026-06-22-error-handler-server-logging.md`
+- 前端线上接入 Railway API 规划：`docs/tasks/2026-06-22-web-online-api-plan.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. 增强 error handler 服务端日志
-2. 前端线上接入 API
+1. 前端线上接入 API
+2. 前端部署
 
 ## Working Agreement
 
