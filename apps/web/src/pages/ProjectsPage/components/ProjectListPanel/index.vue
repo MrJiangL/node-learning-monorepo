@@ -52,7 +52,9 @@ function handleSubmitCreateProject() {
       <h2>Projects</h2>
       <div class="toolbar">
         <button type="button" @click="emit('loadProjects')">
-          {{ props.projectListState.status === "loading" ? "加载中..." : "加载 Projects" }}
+          {{
+            props.projectListState.status === "loading" ? "正在加载 Projects..." : "加载 Projects"
+          }}
         </button>
         <button type="button" @click="emit('logout')">退出登录</button>
       </div>
@@ -70,6 +72,7 @@ function handleSubmitCreateProject() {
     </form>
 
     <p v-if="props.projectListState.status === 'idle'">登录后可以加载你的 Project。</p>
+    <p v-if="props.projectListState.status === 'loading'">正在加载 Projects...</p>
     <p v-if="props.projectListState.status === 'error'" class="error">
       {{ props.projectListState.message }}
     </p>
@@ -79,7 +82,7 @@ function handleSubmitCreateProject() {
         props.projectListState.status === 'success' && props.projectListState.projects.length === 0
       "
     >
-      你还没有 Project。
+      你还没有 Project，先创建一个吧。
     </p>
 
     <ul v-if="props.projectListState.status === 'success'" class="project-list">

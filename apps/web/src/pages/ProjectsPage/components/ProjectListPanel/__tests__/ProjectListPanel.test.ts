@@ -3,6 +3,64 @@ import { describe, expect, it } from "vitest";
 import ProjectListPanel from "../index.vue";
 
 describe("ProjectListPanel", () => {
+  it("idle 状态提示用户可以加载 Project", () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: null,
+        projectListState: {
+          status: "idle"
+        }
+      }
+    });
+
+    // idle 表示“还没开始加载”。
+    //
+    // 用户此时需要知道下一步可以做什么，
+    // 所以组件应该给出可行动的提示，而不是空白一片。
+    expect(wrapper.text()).toContain("登录后可以加载你的 Project");
+  });
+
+  it("loading 状态显示正在加载 Projects", () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: null,
+        projectListState: {
+          status: "loading"
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("正在加载 Projects");
+  });
+
+  it("error 状态显示错误信息", () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: null,
+        projectListState: {
+          status: "error",
+          message: "加载 Project 失败"
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("加载 Project 失败");
+  });
+
+  it("success 但列表为空时显示空状态", () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: null,
+        projectListState: {
+          status: "success",
+          projects: []
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("你还没有 Project，先创建一个吧");
+  });
+
   it("会渲染传入的 Project 列表", () => {
     const wrapper = mount(ProjectListPanel, {
       props: {
@@ -62,5 +120,26 @@ describe("ProjectListPanel", () => {
         }
       ]
     ]);
+  });
+
+  it("点击退出登录按钮时会 emit logout 事件", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: null,
+        projectListState: {
+          status: "idle"
+        }
+      }
+    });
+
+    const logoutButton = wrapper.findAll("button").find((button) => button.text() === "退出登录");
+
+    if (!logoutButton) {
+      throw new Error("没有找到“退出登录”按钮");
+    }
+
+    await logoutButton.trigger("click");
+
+    expect(wrapper.emitted("logout")).toEqual([[]]);
   });
 });

@@ -222,3 +222,18 @@
   gap: 8px;
   justify-content: flex-end;
 }
+
+.link-button {
+  background: transparent;
+  border: 0;
+  color: #2563eb;
+  cursor: pointer;
+  font: inherit;
+  margin-top: 20px;
+  padding: 0;
+  text-align: center;
+}
+
+.link-button:hover {
+  text-decoration: underline;
+}

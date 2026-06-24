@@ -35,13 +35,19 @@
 
 ## 完成标准
 
-- [ ] 前端平台连接 GitHub 仓库
-- [ ] 前端 build 成功
-- [ ] 配置 `VITE_API_BASE_URL`
-- [ ] Railway API 配置 `CORS_ORIGIN`
-- [ ] 线上前端能登录
-- [ ] 线上前端能创建 / 查询 Project
-- [ ] 线上前端能创建 / 查询 Todo
+- [x] 前端平台连接 GitHub 仓库
+- [x] 前端 build 成功
+- [x] 配置 `VITE_API_BASE_URL`
+- [x] Railway API 配置 `CORS_ORIGIN`
+- [x] 线上前端能登录
+- [x] 线上前端能创建 / 查询 Project
+- [x] 线上前端能创建 / 查询 Todo
+
+## 完成记录
+
+- 前端地址：`https://scintillating-pavlova-dc76e0.netlify.app/projects`
+- 完成时间：2026-06-23
+- 验证方式：使用测试账号在线上前端完成登录，并验证 Project / Todo 主链路。
 
 完成后告诉我：
 

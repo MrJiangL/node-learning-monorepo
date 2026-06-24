@@ -1,4 +1,4 @@
-import type { AuthTokenResult, LoginUserInput } from "@learn/shared";
+import type { AuthTokenResult, LoginUserInput, RegisterUserInput, User } from "@learn/shared";
 import { buildApiUrl } from "./api-url";
 import { parseApiError } from "./api-error";
 
@@ -10,6 +10,11 @@ export type LoginResponse = {
 export type RefreshTokenResponse = {
   success: true;
   data: AuthTokenResult;
+};
+
+export type RegisterResponse = {
+  success: true;
+  data: User;
 };
 
 export async function loginUser(input: LoginUserInput): Promise<LoginResponse> {
@@ -57,4 +62,20 @@ export async function refreshAuthToken(refreshToken: string): Promise<RefreshTok
   }
 
   return response.json() as Promise<RefreshTokenResponse>;
+}
+
+export async function registerUser(input: RegisterUserInput): Promise<RegisterResponse> {
+  const response = await fetch(buildApiUrl("/auth/register"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(input)
+  });
+
+  if (!response.ok) {
+    throw await parseApiError(response, "注册失败，请检查邮箱或密码");
+  }
+
+  return response.json() as Promise<RegisterResponse>;
 }

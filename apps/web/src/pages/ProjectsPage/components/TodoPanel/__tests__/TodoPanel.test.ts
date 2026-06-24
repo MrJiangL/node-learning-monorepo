@@ -3,6 +3,60 @@ import { describe, expect, it } from "vitest";
 import TodoPanel from "../index.vue";
 
 describe("TodoPanel", () => {
+  it("没有选中 Project 时提示先选择 Project", () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: null,
+        todoListState: {
+          status: "idle"
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("先选择一个 Project，再查看 Todo");
+  });
+
+  it("loading 状态显示正在加载 Todos", () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "loading"
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("正在加载 Todos");
+  });
+
+  it("error 状态显示错误信息", () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "error",
+          message: "加载 Todo 失败"
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("加载 Todo 失败");
+  });
+
+  it("success 但 todos 为空时显示空状态", () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "success",
+          todos: []
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("这个 Project 还没有 Todo");
+  });
+
   it("提交创建表单时会 emit createTodo 事件", async () => {
     const wrapper = mount(TodoPanel, {
       props: {

@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import { getAuthToken } from "../auth/token-storage";
 import LoginPage from "../pages/LoginPage/index.vue";
 import ProjectsPage from "../pages/ProjectsPage/index.vue";
+import RegisterPage from "../pages/RegisterPage/index.vue";
 
 export const router = createRouter({
   // createWebHistory 会让 URL 看起来像 /login、/projects。
@@ -26,6 +27,10 @@ export const router = createRouter({
       meta: {
         requiresAuth: true
       }
+    },
+    {
+      path: "/register",
+      component: RegisterPage
     }
   ]
 });

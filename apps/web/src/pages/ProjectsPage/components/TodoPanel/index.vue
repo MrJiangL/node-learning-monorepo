@@ -78,7 +78,7 @@ function handleSaveTodoTitle(todoId: string) {
       <button type="submit">创建 Todo</button>
     </form>
 
-    <p v-if="props.todoListState.status === 'loading'">正在加载 Todo...</p>
+    <p v-if="props.todoListState.status === 'loading'">正在加载 Todos...</p>
     <p v-if="props.todoListState.status === 'error'" class="error">
       {{ props.todoListState.message }}
     </p>

@@ -211,17 +211,24 @@ Task 5: Prisma Persistence With MySQL
 - 增强 Error Handler 服务端日志：`docs/tasks/2026-06-22-error-handler-server-logging.md`
 - 前端线上接入 Railway API 规划：`docs/tasks/2026-06-22-web-online-api-plan.md`
 - 前端 API Base URL 和后端 CORS：`docs/tasks/2026-06-23-web-api-base-url-cors.md`
+- 前端首次部署：`docs/tasks/2026-06-23-web-first-deploy.md`
+- 前后端线上联调复盘：`docs/tasks/2026-06-23-web-online-integration-retrospective.md`
+- 部署后下一阶段选择：`docs/tasks/2026-06-23-post-deploy-next-stage-planning.md`
+- 前端产品体验：注册页：`docs/tasks/2026-06-23-web-register-page.md`
+- 前端登录态体验：退出登录和自动跳转：`docs/tasks/2026-06-23-web-auth-state-experience.md`
+- 前端体验状态优化：空状态、错误状态、loading 状态：`docs/tasks/2026-06-23-web-empty-error-loading-states.md`
 
 ## Current
 
-- 前端首次部署：`docs/tasks/2026-06-23-web-first-deploy.md`
+- 线上注册 / 登录 / 退出 smoke 复盘：`docs/tasks/2026-06-23-web-online-auth-smoke-retrospective.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. 前端部署
-2. 前后端线上联调复盘
+1. 线上注册 / 登录 / 退出 smoke 复盘
+2. 前端产品体验阶段复盘
+3. 选择下一阶段：继续前端体验，还是回到监控 / 部署稳定性
 
 ## Working Agreement
 
