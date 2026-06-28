@@ -3,6 +3,7 @@ import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
 import { createApp } from "../../src/app.js";
 import { createRequestLogger } from "../../src/middleware/request-logger.js";
+import { requestId } from "../../src/middleware/request-id.js";
 
 describe("GET /health", () => {
   it("does not log requests in test environment", async () => {
@@ -30,6 +31,7 @@ describe("GET /health", () => {
     // 这个测试想单独验证 requestLogger 的 enabled=true 分支，
     // 所以直接把 createRequestLogger({ enabled: true }) 挂到最小 app 上。
     const app = express();
+    app.use(requestId);
     app.use(createRequestLogger({ enabled: true }));
     app.get("/health", (_request, response) => {
       response.status(200).json({ success: true });
@@ -38,9 +40,11 @@ describe("GET /health", () => {
     const logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
 
     try {
-      await request(app).get("/health").expect(200);
+      await request(app).get("/health").set("x-request-id", "health-log-test").expect(200);
 
-      expect(logSpy).toHaveBeenCalledWith(expect.stringMatching(/^GET \/health 200 \d+ms$/));
+      expect(logSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/^health-log-test GET \/health 200 \d+ms$/)
+      );
     } finally {
       logSpy.mockRestore();
     }

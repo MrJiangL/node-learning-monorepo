@@ -3,13 +3,16 @@ import type { Todo } from "@learn/shared";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { clearAuthToken } from "../../auth/token-storage";
+import ActivityLogPanel from "./components/ActivityLogPanel/index.vue";
 import ProjectListPanel from "./components/ProjectListPanel/index.vue";
 import TodoPanel from "./components/TodoPanel/index.vue";
+import { useActivityLogs } from "./composables/useActivityLogs";
 import { useProjects } from "./composables/useProjects";
 import { useTodos } from "./composables/useTodos";
 
 const router = useRouter();
 const { projectListState, loadProjects, createProjectFromInput } = useProjects();
+const { activityLogListState, loadActivityLogs } = useActivityLogs();
 const {
   todoListState,
   loadTodos,
@@ -26,7 +29,7 @@ async function handleSelectProject(projectId: string) {
   // 它表示“当前用户正在查看哪个 Project 的 Todo”，
   // 所以仍然放在 ProjectsPage，而不是放进 useTodos。
   selectedProjectId.value = projectId;
-  await loadTodos(projectId);
+  await Promise.all([loadTodos(projectId), loadActivityLogs(projectId)]);
 }
 
 async function handleCreateTodo(input: { title: string }) {
@@ -35,6 +38,7 @@ async function handleCreateTodo(input: { title: string }) {
   // 当前选中的 Project 由页面状态 selectedProjectId 管理，
   // 所以这里把 selectedProjectId 和表单 input 一起交给 useTodos。
   await createTodoForProject(selectedProjectId.value, input);
+  await loadActivityLogs(selectedProjectId.value);
 }
 
 async function handleToggleTodo(todo: Todo) {
@@ -43,6 +47,7 @@ async function handleToggleTodo(todo: Todo) {
   // 页面本身不再关心 PATCH /todos/:id 的细节，
   // 只是把“当前 Project + 当前 Todo”交给 composable。
   await toggleTodo(selectedProjectId.value, todo);
+  await loadActivityLogs(selectedProjectId.value);
 }
 
 async function handleSaveTodoTitle(todoId: string, input: { title: string }) {
@@ -51,6 +56,7 @@ async function handleSaveTodoTitle(todoId: string, input: { title: string }) {
   // 这件事已经封装在 saveTodoTitle 里，
   // 页面只负责把事件参数转发过去。
   await saveTodoTitle(selectedProjectId.value, todoId, input);
+  await loadActivityLogs(selectedProjectId.value);
 }
 
 async function handleDeleteTodo(todoId: string) {
@@ -58,6 +64,7 @@ async function handleDeleteTodo(todoId: string) {
   //
   // 因为删除成功后 useTodos 会重新加载这个 Project 下的 Todo 列表。
   await deleteTodoFromProject(selectedProjectId.value, todoId);
+  await loadActivityLogs(selectedProjectId.value);
 }
 
 async function handleLogout() {
@@ -87,6 +94,12 @@ async function handleLogout() {
       @toggle-todo="handleToggleTodo"
       @save-todo-title="handleSaveTodoTitle"
       @delete-todo="handleDeleteTodo"
+    />
+
+    <ActivityLogPanel
+      :selected-project-id="selectedProjectId"
+      :activity-log-list-state="activityLogListState"
+      @load-activity-logs="loadActivityLogs(selectedProjectId)"
     />
   </main>
 </template>

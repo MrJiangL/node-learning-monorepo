@@ -217,18 +217,29 @@ Task 5: Prisma Persistence With MySQL
 - 前端产品体验：注册页：`docs/tasks/2026-06-23-web-register-page.md`
 - 前端登录态体验：退出登录和自动跳转：`docs/tasks/2026-06-23-web-auth-state-experience.md`
 - 前端体验状态优化：空状态、错误状态、loading 状态：`docs/tasks/2026-06-23-web-empty-error-loading-states.md`
+- 线上注册 / 登录 / 退出 smoke 复盘：`docs/tasks/2026-06-23-web-online-auth-smoke-retrospective.md`
+- 前端产品体验阶段复盘：`docs/tasks/2026-06-24-web-product-experience-retrospective.md`
+- 生产化监控增强：Request ID 日志串联：`docs/tasks/2026-06-24-request-id-logging.md`
+- 线上错误定位复盘：`docs/tasks/2026-06-24-online-error-diagnosis-retrospective.md`
+- 生产化监控阶段复盘：`docs/tasks/2026-06-24-production-observability-stage-retrospective.md`
+- 部署稳定性：上线前 Checklist 和回滚预案：`docs/tasks/2026-06-26-deployment-stability-checklist.md`
+- 部署稳定性阶段复盘：`docs/tasks/2026-06-28-deployment-stability-retrospective.md`
+- 前端业务功能：展示 Project Activity Log：`docs/tasks/2026-06-28-web-activity-log-panel.md`
+- Activity Log 前端展示 smoke 和复盘：`docs/tasks/2026-06-28-web-activity-log-smoke-retrospective.md`
+- Activity Log 体验优化：中文 action 和时间格式化：`docs/tasks/2026-06-28-web-activity-log-experience-polish.md`
+- Activity Log 体验优化 smoke 和复盘：`docs/tasks/2026-06-28-web-activity-log-experience-smoke-retrospective.md`
 
 ## Current
 
-- 线上注册 / 登录 / 退出 smoke 复盘：`docs/tasks/2026-06-23-web-online-auth-smoke-retrospective.md`
+- Activity Log 前端展示线上 smoke：`docs/tasks/2026-06-28-web-activity-log-online-smoke.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. 线上注册 / 登录 / 退出 smoke 复盘
-2. 前端产品体验阶段复盘
-3. 选择下一阶段：继续前端体验，还是回到监控 / 部署稳定性
+1. Activity Log 前端展示线上 smoke
+2. Activity Log 线上 smoke 复盘
+3. 选择下一阶段：继续业务功能，还是继续 Activity Log 进阶
 
 ## Working Agreement
 

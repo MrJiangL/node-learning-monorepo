@@ -27,7 +27,7 @@ export function createRequestLogger(options: RequestLoggerOptions): RequestHandl
     response.on("finish", () => {
       const durationMs = Date.now() - startTime;
       console.log(
-        `${request.method} ${request.originalUrl} ${response.statusCode} ${durationMs}ms`
+        `${request.requestId} ${request.method} ${request.originalUrl} ${response.statusCode} ${durationMs}ms`
       );
     });
 

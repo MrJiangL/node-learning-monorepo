@@ -26,6 +26,7 @@ export const errorHandler: ErrorRequestHandler = (error, request, response, _nex
   // 学习重点：不要把未知错误的原始 message 直接返回给用户。
   // 真实项目里，详细错误应该写入服务端日志；客户端只看到通用提示。
   console.error("Unhandled request error", {
+    requestId: request.requestId,
     method: request.method,
     path: request.originalUrl,
     errorName: error instanceof Error ? error.name : typeof error,

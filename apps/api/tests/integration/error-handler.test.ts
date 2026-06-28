@@ -2,10 +2,12 @@ import express from "express";
 import request from "supertest";
 import { describe, expect, it, vi } from "vitest";
 import { errorHandler } from "../../src/middleware/error-handler.js";
+import { requestId } from "../../src/middleware/request-id.js";
 
 describe("error handler", () => {
   it("logs unexpected errors on the server without leaking details to the client", async () => {
     const app = express();
+    app.use(requestId);
     app.get("/boom", () => {
       throw new Error("database exploded with internal details");
     });
@@ -14,7 +16,7 @@ describe("error handler", () => {
     const errorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
     try {
-      const response = await request(app).get("/boom");
+      const response = await request(app).get("/boom").set("x-request-id", "boom-request-id");
 
       expect(response.status).toBe(500);
       expect(response.body).toEqual({
@@ -28,6 +30,7 @@ describe("error handler", () => {
       expect(errorSpy).toHaveBeenCalledWith(
         "Unhandled request error",
         expect.objectContaining({
+          requestId: "boom-request-id",
           method: "GET",
           path: "/boom",
           errorName: "Error",

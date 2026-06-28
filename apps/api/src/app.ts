@@ -14,6 +14,7 @@ import type { RedisClientType } from "redis";
 import { createJobsRouter } from "./jobs/jobs.routes.js";
 import type { JobRepository } from "./jobs/job.repository.js";
 import { createActivityLogsRouter } from "./modules/activity-logs/activity-logs.routes.js";
+import { requestId } from "./middleware/request-id.js";
 
 export type CreateAppOptions = {
   projectCacheClient?: RedisClientType;
@@ -37,6 +38,8 @@ export function createApp(options: CreateAppOptions = {}) {
       })
     );
   }
+
+  app.use(requestId);
 
   // requestLogger 要尽量靠前注册。
   //

@@ -105,6 +105,10 @@
   margin-top: 32px;
 }
 
+.activity-log-panel {
+  margin-top: 32px;
+}
+
 .todo-form {
   display: flex;
   gap: 12px;
@@ -167,6 +171,27 @@
   font: inherit;
   font-weight: 700;
   white-space: nowrap;
+}
+
+.activity-log-list {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 16px 0 0;
+  list-style: none;
+}
+
+.activity-log-list li {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.activity-log-list span,
+.activity-log-list time {
+  color: #6b7280;
 }
 
 .todo-actions {
