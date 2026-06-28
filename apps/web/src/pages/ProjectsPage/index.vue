@@ -11,15 +11,22 @@ import { useProjects } from "./composables/useProjects";
 import { useTodos } from "./composables/useTodos";
 
 const router = useRouter();
-const { projectListState, loadProjects, createProjectFromInput } = useProjects();
-const { activityLogListState, loadActivityLogs } = useActivityLogs();
+const {
+  projectListState,
+  loadProjects,
+  createProjectFromInput,
+  saveProject,
+  deleteProjectFromList
+} = useProjects();
+const { activityLogListState, loadActivityLogs, resetActivityLogs } = useActivityLogs();
 const {
   todoListState,
   loadTodos,
   createTodoForProject,
   toggleTodo,
   saveTodoTitle,
-  deleteTodoFromProject
+  deleteTodoFromProject,
+  resetTodos
 } = useTodos();
 const selectedProjectId = ref<string | null>(null);
 
@@ -67,6 +74,21 @@ async function handleDeleteTodo(todoId: string) {
   await loadActivityLogs(selectedProjectId.value);
 }
 
+async function handleSaveProject(projectId: string, input: { name: string; description?: string }) {
+  await saveProject(projectId, input);
+  await loadActivityLogs(projectId);
+}
+
+async function handleDeleteProject(projectId: string) {
+  await deleteProjectFromList(projectId);
+
+  if (selectedProjectId.value === projectId) {
+    selectedProjectId.value = null;
+    resetTodos();
+    resetActivityLogs();
+  }
+}
+
 async function handleLogout() {
   // 退出登录的核心就是删除本地 token。
   //
@@ -85,6 +107,8 @@ async function handleLogout() {
       @logout="handleLogout"
       @select-project="handleSelectProject"
       @create-project="createProjectFromInput"
+      @save-project="handleSaveProject"
+      @delete-project="handleDeleteProject"
     />
 
     <TodoPanel

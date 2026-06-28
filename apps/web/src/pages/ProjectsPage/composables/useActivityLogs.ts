@@ -50,8 +50,13 @@ export function useActivityLogs() {
     }
   }
 
+  function resetActivityLogs() {
+    activityLogListState.value = { status: "idle" };
+  }
+
   return {
     activityLogListState,
-    loadActivityLogs
+    loadActivityLogs,
+    resetActivityLogs
   };
 }

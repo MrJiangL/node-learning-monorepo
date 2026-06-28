@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useProjects } from "../useProjects";
-import { fetchProjects } from "../../../../api/projects";
+import { deleteProject, fetchProjects, updateProject } from "../../../../api/projects";
 import { getAuthToken } from "../../../../auth/token-storage";
 
 // vi.mock 会把指定模块替换成我们给出的假实现。
@@ -18,7 +18,9 @@ vi.mock("../../../../auth/token-storage", () => ({
 // 所以这里把 API client 整个 mock 掉，只保留“有没有被调用、返回什么数据”这层行为。
 vi.mock("../../../../api/projects", () => ({
   createProject: vi.fn(),
-  fetchProjects: vi.fn()
+  deleteProject: vi.fn(),
+  fetchProjects: vi.fn(),
+  updateProject: vi.fn()
 }));
 
 // vi.mocked(...) 主要是给 TypeScript 用的。
@@ -26,7 +28,9 @@ vi.mock("../../../../api/projects", () => ({
 // 它告诉 TS：“这个函数现在是 Vitest mock 函数”，
 // 所以后面才能安全调用 mockReturnValue / mockResolvedValue。
 const mockedGetAuthToken = vi.mocked(getAuthToken);
+const mockedDeleteProject = vi.mocked(deleteProject);
 const mockedFetchProjects = vi.mocked(fetchProjects);
+const mockedUpdateProject = vi.mocked(updateProject);
 
 describe("useProjects", () => {
   beforeEach(() => {
@@ -95,5 +99,65 @@ describe("useProjects", () => {
         }
       ]
     });
+  });
+
+  it("保存 Project 时调用 updateProject 后重新加载列表", async () => {
+    mockedGetAuthToken.mockReturnValue("test-token");
+    mockedUpdateProject.mockResolvedValue({
+      success: true,
+      data: {
+        id: "project-1",
+        userId: "user-1",
+        name: "更新后的 Project",
+        description: "更新后的描述",
+        createdAt: "2026-06-02T00:00:00.000Z",
+        updatedAt: "2026-06-28T00:00:00.000Z"
+      }
+    });
+    mockedFetchProjects.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
+      }
+    });
+
+    const { saveProject } = useProjects();
+
+    await saveProject("project-1", {
+      name: "更新后的 Project",
+      description: "更新后的描述"
+    });
+
+    expect(mockedUpdateProject).toHaveBeenCalledWith("project-1", "test-token", {
+      name: "更新后的 Project",
+      description: "更新后的描述"
+    });
+    expect(mockedFetchProjects).toHaveBeenCalledTimes(1);
+  });
+
+  it("删除 Project 时调用 deleteProject 后重新加载列表", async () => {
+    mockedGetAuthToken.mockReturnValue("test-token");
+    mockedDeleteProject.mockResolvedValue(undefined);
+    mockedFetchProjects.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
+      }
+    });
+
+    const { deleteProjectFromList } = useProjects();
+
+    await deleteProjectFromList("project-1");
+
+    expect(mockedDeleteProject).toHaveBeenCalledWith("project-1", "test-token");
+    expect(mockedFetchProjects).toHaveBeenCalledTimes(1);
   });
 });

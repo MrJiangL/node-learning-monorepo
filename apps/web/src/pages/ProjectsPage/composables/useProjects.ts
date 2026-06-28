@@ -1,6 +1,6 @@
 import type { Project } from "@learn/shared";
 import { ref } from "vue";
-import { createProject, fetchProjects } from "../../../api/projects";
+import { createProject, deleteProject, fetchProjects, updateProject } from "../../../api/projects";
 import { getAuthToken } from "../../../auth/token-storage";
 
 type ProjectListState =
@@ -11,6 +11,11 @@ type ProjectListState =
 
 type CreateProjectFormInput = {
   name: string;
+  description?: string;
+};
+
+type UpdateProjectFormInput = {
+  name?: string;
   description?: string;
 };
 
@@ -64,9 +69,55 @@ export function useProjects() {
     await loadProjects();
   }
 
+  async function saveProject(projectId: string, input: UpdateProjectFormInput) {
+    const token = getAuthToken();
+
+    if (!token) {
+      projectListState.value = {
+        status: "error",
+        message: "请先登录，再更新 Project"
+      };
+      return;
+    }
+
+    try {
+      await updateProject(projectId, token, input);
+      await loadProjects();
+    } catch (error) {
+      projectListState.value = {
+        status: "error",
+        message: error instanceof Error ? error.message : "未知错误"
+      };
+    }
+  }
+
+  async function deleteProjectFromList(projectId: string) {
+    const token = getAuthToken();
+
+    if (!token) {
+      projectListState.value = {
+        status: "error",
+        message: "请先登录，再删除 Project"
+      };
+      return;
+    }
+
+    try {
+      await deleteProject(projectId, token);
+      await loadProjects();
+    } catch (error) {
+      projectListState.value = {
+        status: "error",
+        message: error instanceof Error ? error.message : "未知错误"
+      };
+    }
+  }
+
   return {
     projectListState,
     loadProjects,
-    createProjectFromInput
+    createProjectFromInput,
+    saveProject,
+    deleteProjectFromList
   };
 }

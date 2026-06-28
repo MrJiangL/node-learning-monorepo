@@ -18,10 +18,15 @@ const emit = defineEmits<{
   logout: [];
   selectProject: [projectId: string];
   createProject: [input: { name: string; description?: string }];
+  saveProject: [projectId: string, input: { name: string; description?: string }];
+  deleteProject: [projectId: string];
 }>();
 
 const projectName = ref("");
 const projectDescription = ref("");
+const editingProjectId = ref<string | null>(null);
+const editingProjectName = ref("");
+const editingProjectDescription = ref("");
 
 function handleSubmitCreateProject() {
   const name = projectName.value.trim();
@@ -43,6 +48,46 @@ function handleSubmitCreateProject() {
 
   projectName.value = "";
   projectDescription.value = "";
+}
+
+function handleStartEditProject(project: Project) {
+  // 编辑状态只影响 ProjectListPanel 内部展示。
+  //
+  // 真正保存时仍然通过 emit 交给父组件处理，
+  // 这样组件不会知道 API、token 或列表刷新细节。
+  editingProjectId.value = project.id;
+  editingProjectName.value = project.name;
+  editingProjectDescription.value = project.description ?? "";
+}
+
+function handleCancelEditProject() {
+  editingProjectId.value = null;
+  editingProjectName.value = "";
+  editingProjectDescription.value = "";
+}
+
+function handleSaveProject(projectId: string) {
+  const name = editingProjectName.value.trim();
+  const description = editingProjectDescription.value.trim();
+
+  if (!name) {
+    alert("Project 名称不能为空");
+    return;
+  }
+
+  emit("saveProject", projectId, {
+    name,
+    description: description || undefined
+  });
+  handleCancelEditProject();
+}
+
+function handleDeleteProject(projectId: string) {
+  if (!confirm("确定要删除这个 Project 吗？")) {
+    return;
+  }
+
+  emit("deleteProject", projectId);
 }
 </script>
 
@@ -91,11 +136,25 @@ function handleSubmitCreateProject() {
         :key="project.id"
         :class="{ selected: props.selectedProjectId === project.id }"
       >
-        <strong>{{ project.name }}</strong>
-        <span>{{ project.description ?? "暂无描述" }}</span>
-        <button type="button" @click="emit('selectProject', project.id)">
-          {{ props.selectedProjectId === project.id ? "已选择" : "选择" }}
-        </button>
+        <div v-if="editingProjectId !== project.id">
+          <strong>{{ project.name }}</strong>
+          <span>{{ project.description ?? "暂无描述" }}</span>
+        </div>
+
+        <div v-if="editingProjectId === project.id" class="project-edit-form">
+          <input v-model="editingProjectName" name="editingProjectName" type="text" />
+          <input v-model="editingProjectDescription" name="editingProjectDescription" type="text" />
+          <button type="button" @click="handleSaveProject(project.id)">保存</button>
+          <button type="button" @click="handleCancelEditProject">取消</button>
+        </div>
+
+        <div class="project-actions">
+          <button type="button" @click="emit('selectProject', project.id)">
+            {{ props.selectedProjectId === project.id ? "已选择" : "选择" }}
+          </button>
+          <button type="button" @click="handleStartEditProject(project)">编辑</button>
+          <button type="button" @click="handleDeleteProject(project.id)">删除</button>
+        </div>
       </li>
     </ul>
   </section>

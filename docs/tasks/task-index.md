@@ -228,18 +228,20 @@ Task 5: Prisma Persistence With MySQL
 - Activity Log 前端展示 smoke 和复盘：`docs/tasks/2026-06-28-web-activity-log-smoke-retrospective.md`
 - Activity Log 体验优化：中文 action 和时间格式化：`docs/tasks/2026-06-28-web-activity-log-experience-polish.md`
 - Activity Log 体验优化 smoke 和复盘：`docs/tasks/2026-06-28-web-activity-log-experience-smoke-retrospective.md`
+- Activity Log 前端展示线上 smoke：`docs/tasks/2026-06-28-web-activity-log-online-smoke.md`
+- 前端业务功能：Project 编辑和删除入口：`docs/tasks/2026-06-28-web-project-edit-delete.md`
+- Project 编辑删除 smoke 和复盘：`docs/tasks/2026-06-28-web-project-edit-delete-smoke-retrospective.md`
 
 ## Current
 
-- Activity Log 前端展示线上 smoke：`docs/tasks/2026-06-28-web-activity-log-online-smoke.md`
+- Project 编辑删除线上 smoke：`docs/tasks/2026-06-28-web-project-edit-delete-online-smoke.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. Activity Log 前端展示线上 smoke
-2. Activity Log 线上 smoke 复盘
-3. 选择下一阶段：继续业务功能，还是继续 Activity Log 进阶
+1. Project 编辑删除线上 smoke
+2. 线上 smoke 复盘后，选择继续业务功能还是体验打磨
 
 ## Working Agreement
 

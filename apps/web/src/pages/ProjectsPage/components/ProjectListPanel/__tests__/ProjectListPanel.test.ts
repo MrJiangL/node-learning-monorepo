@@ -1,8 +1,25 @@
 import { mount } from "@vue/test-utils";
-import { describe, expect, it } from "vitest";
+import type { Project } from "@learn/shared";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import ProjectListPanel from "../index.vue";
 
+function createProject(overrides: Partial<Project> = {}): Project {
+  return {
+    id: "project-1",
+    userId: "user-1",
+    name: "学习 Node",
+    description: "每天练一点",
+    createdAt: "2026-06-02T00:00:00.000Z",
+    updatedAt: "2026-06-02T00:00:00.000Z",
+    ...overrides
+  };
+}
+
 describe("ProjectListPanel", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("idle 状态提示用户可以加载 Project", () => {
     const wrapper = mount(ProjectListPanel, {
       props: {
@@ -69,12 +86,7 @@ describe("ProjectListPanel", () => {
           status: "success",
           projects: [
             {
-              id: "project-1",
-              userId: "user-1",
-              name: "学习 Node",
-              description: "每天练一点",
-              createdAt: "2026-06-02T00:00:00.000Z",
-              updatedAt: "2026-06-02T00:00:00.000Z"
+              ...createProject()
             }
           ]
         }
@@ -141,5 +153,156 @@ describe("ProjectListPanel", () => {
     await logoutButton.trigger("click");
 
     expect(wrapper.emitted("logout")).toEqual([[]]);
+  });
+
+  it("点击编辑后显示 Project 编辑表单", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+
+    expect(wrapper.get('input[name="editingProjectName"]').element).toHaveProperty(
+      "value",
+      "学习 Node"
+    );
+    expect(wrapper.get('input[name="editingProjectDescription"]').element).toHaveProperty(
+      "value",
+      "每天练一点"
+    );
+    expect(wrapper.text()).toContain("保存");
+    expect(wrapper.text()).toContain("取消");
+  });
+
+  it("保存编辑时会 emit saveProject 事件", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+    await wrapper.get('input[name="editingProjectName"]').setValue("更新后的 Project");
+    await wrapper.get('input[name="editingProjectDescription"]').setValue("更新后的描述");
+
+    const saveButton = wrapper.findAll("button").find((button) => button.text() === "保存");
+
+    if (!saveButton) {
+      throw new Error("没有找到“保存”按钮");
+    }
+
+    await saveButton.trigger("click");
+
+    expect(wrapper.emitted("saveProject")).toEqual([
+      [
+        "project-1",
+        {
+          name: "更新后的 Project",
+          description: "更新后的描述"
+        }
+      ]
+    ]);
+  });
+
+  it("取消编辑时退出编辑状态且不 emit saveProject", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+
+    const cancelButton = wrapper.findAll("button").find((button) => button.text() === "取消");
+
+    if (!cancelButton) {
+      throw new Error("没有找到“取消”按钮");
+    }
+
+    await cancelButton.trigger("click");
+
+    expect(wrapper.find('input[name="editingProjectName"]').exists()).toBe(false);
+    expect(wrapper.emitted("saveProject")).toBeUndefined();
+  });
+
+  it("确认删除时会 emit deleteProject 事件", async () => {
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
+
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const deleteButton = wrapper.findAll("button").find((button) => button.text() === "删除");
+
+    if (!deleteButton) {
+      throw new Error("没有找到“删除”按钮");
+    }
+
+    await deleteButton.trigger("click");
+
+    expect(confirm).toHaveBeenCalledWith("确定要删除这个 Project 吗？");
+    expect(wrapper.emitted("deleteProject")).toEqual([["project-1"]]);
+  });
+
+  it("取消删除时不会 emit deleteProject 事件", async () => {
+    vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
+
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const deleteButton = wrapper.findAll("button").find((button) => button.text() === "删除");
+
+    if (!deleteButton) {
+      throw new Error("没有找到“删除”按钮");
+    }
+
+    await deleteButton.trigger("click");
+
+    expect(wrapper.emitted("deleteProject")).toBeUndefined();
   });
 });

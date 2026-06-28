@@ -101,6 +101,26 @@
   font-weight: 700;
 }
 
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-edit-form {
+  display: grid;
+  gap: 8px;
+}
+
+.project-edit-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font: inherit;
+}
+
 .todo-panel {
   margin-top: 32px;
 }

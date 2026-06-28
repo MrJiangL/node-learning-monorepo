@@ -1,4 +1,9 @@
-import type { CreateProjectInput, PaginatedResult, Project } from "@learn/shared";
+import type {
+  CreateProjectInput,
+  PaginatedResult,
+  Project,
+  UpdateProjectInput
+} from "@learn/shared";
 import { buildApiUrl } from "./api-url";
 import { parseApiError } from "./api-error";
 import { authenticatedFetch } from "./authenticated-fetch.ts";
@@ -10,6 +15,11 @@ export type ListProjectsResponse = {
 };
 
 export type CreateProjectResponse = {
+  success: true;
+  data: Project;
+};
+
+export type UpdateProjectResponse = {
   success: true;
   data: Project;
 };
@@ -56,4 +66,44 @@ export async function createProject(
   }
 
   return response.json() as Promise<CreateProjectResponse>;
+}
+
+export async function updateProject(
+  projectId: string,
+  token: string,
+  input: UpdateProjectInput
+): Promise<UpdateProjectResponse> {
+  // PATCH /projects/:id 是局部更新。
+  //
+  // 前端只传 name / description，id 和 userId 仍然由服务端控制。
+  const response = await authenticatedFetch(buildApiUrl(`/projects/${projectId}`), {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`
+    },
+    body: JSON.stringify(input)
+  });
+
+  if (!response.ok) {
+    throw await parseApiError(response, "更新 Project 失败");
+  }
+
+  return response.json() as Promise<UpdateProjectResponse>;
+}
+
+export async function deleteProject(projectId: string, token: string): Promise<void> {
+  // DELETE /projects/:id 成功时后端返回 204 No Content。
+  //
+  // 所以这里和 deleteTodo 一样，不需要读取 response.json()。
+  const response = await authenticatedFetch(buildApiUrl(`/projects/${projectId}`), {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw await parseApiError(response, "删除 Project 失败");
+  }
 }

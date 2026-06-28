@@ -163,12 +163,17 @@ export function useTodos() {
     await loadTodos(projectId);
   }
 
+  function resetTodos() {
+    todoListState.value = { status: "idle" };
+  }
+
   return {
     todoListState,
     loadTodos,
     createTodoForProject,
     toggleTodo,
     saveTodoTitle,
-    deleteTodoFromProject
+    deleteTodoFromProject,
+    resetTodos
   };
 }

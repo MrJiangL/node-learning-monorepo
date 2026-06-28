@@ -100,4 +100,27 @@ describe("useTodos", () => {
       ]
     });
   });
+
+  it("resetTodos 会把 Todo 状态恢复到 idle", async () => {
+    mockedGetAuthToken.mockReturnValue("test-token");
+    mockedFetchTodos.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
+      }
+    });
+
+    const { todoListState, loadTodos, resetTodos } = useTodos();
+
+    await loadTodos("project-1");
+    resetTodos();
+
+    expect(todoListState.value).toEqual({
+      status: "idle"
+    });
+  });
 });

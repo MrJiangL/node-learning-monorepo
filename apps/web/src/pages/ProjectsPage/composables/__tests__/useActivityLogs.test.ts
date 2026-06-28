@@ -92,4 +92,27 @@ describe("useActivityLogs", () => {
       ]
     });
   });
+
+  it("resetActivityLogs 会把活动记录状态恢复到 idle", async () => {
+    mockedGetAuthToken.mockReturnValue("access-token");
+    mockedFetchActivityLogs.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
+      }
+    });
+
+    const { activityLogListState, loadActivityLogs, resetActivityLogs } = useActivityLogs();
+
+    await loadActivityLogs("project-1");
+    resetActivityLogs();
+
+    expect(activityLogListState.value).toEqual({
+      status: "idle"
+    });
+  });
 });

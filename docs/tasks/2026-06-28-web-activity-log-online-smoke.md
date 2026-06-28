@@ -177,18 +177,38 @@ docs/reviews/web-activity-log-online-smoke.md
 
 ## 完成标准
 
-- [ ] 部署前本地验证通过
-- [ ] Netlify 部署成功
-- [ ] 线上能登录或注册测试账号
-- [ ] 线上能选择 Project
-- [ ] 创建 Todo 后能看到“创建 Todo”
+- [x] 部署前本地验证通过
+- [x] Netlify 部署成功
+- [x] 线上能登录或注册测试账号
+- [x] 线上能选择 Project
+- [x] 创建 Todo 后能看到“创建 Todo”
 - [ ] 完成 Todo 后能看到“完成 Todo”
-- [ ] 时间不是原始 ISO 字符串
-- [ ] 创建 docs/reviews/web-activity-log-online-smoke.md
-- [ ] npm run format:check 通过
+- [x] 时间不是原始 ISO 字符串
+- [x] 创建 docs/reviews/web-activity-log-online-smoke.md
+- [x] npm run format:check 通过
 
-完成后告诉我：
+## 完成记录
+
+- 完成时间：2026-06-28
+- 线上地址：https://scintillating-pavlova-dc76e0.netlify.app/projects
+- 复盘文档：docs/reviews/web-activity-log-online-smoke.md
+- 截图验证：
+  - 线上 `/projects` 页面可访问。
+  - Project `钱234` 可选中。
+  - Todo `312312` 可展示。
+  - Activity Log 面板可展示。
+  - `创建 Todo` 和 `创建 Project` 中文 action 可展示。
+  - 时间显示为 `2026/06/28 19:53`，不是 ISO 原始字符串。
+- 未完全覆盖：
+  - 截图里 Todo 仍是“未完成”，所以这次截图没有证明 `完成 Todo` action。
+  - 后续如果要完整验证 completed 链路，需要点击“标记完成”后确认出现 `完成 Todo`。
+- 验证结果：
+  - npm run format:check 通过
+
+这张任务已经完成。
+
+下一步看：
 
 ```text
-Activity Log 线上 smoke 完成了
+docs/tasks/2026-06-28-web-project-edit-delete.md
 ```
