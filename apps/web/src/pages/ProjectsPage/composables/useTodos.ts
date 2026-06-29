@@ -13,8 +13,9 @@ type CreateTodoFormInput = {
   title: string;
 };
 
-type UpdateTodoTitleFormInput = {
+type UpdateTodoFormInput = {
   title: string;
+  dueDate?: string | null;
 };
 
 export function useTodos() {
@@ -109,11 +110,7 @@ export function useTodos() {
     await loadTodos(projectId);
   }
 
-  async function saveTodoTitle(
-    projectId: string | null,
-    todoId: string,
-    input: UpdateTodoTitleFormInput
-  ) {
+  async function saveTodo(projectId: string | null, todoId: string, input: UpdateTodoFormInput) {
     const token = getAuthToken();
 
     if (!token) {
@@ -172,7 +169,7 @@ export function useTodos() {
     loadTodos,
     createTodoForProject,
     toggleTodo,
-    saveTodoTitle,
+    saveTodo,
     deleteTodoFromProject,
     resetTodos
   };

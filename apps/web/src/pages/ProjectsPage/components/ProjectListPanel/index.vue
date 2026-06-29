@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import type { Project } from "@learn/shared";
 
 type ProjectListState =
@@ -11,6 +11,9 @@ type ProjectListState =
 const props = defineProps<{
   projectListState: ProjectListState;
   selectedProjectId: string | null;
+  savingProjectId?: string | null;
+  deletingProjectId?: string | null;
+  projectMutationError?: string | null;
 }>();
 
 const emit = defineEmits<{
@@ -27,6 +30,26 @@ const projectDescription = ref("");
 const editingProjectId = ref<string | null>(null);
 const editingProjectName = ref("");
 const editingProjectDescription = ref("");
+const confirmingDeleteProjectId = ref<string | null>(null);
+
+watch(
+  () => props.savingProjectId,
+  (savingProjectId, previousSavingProjectId) => {
+    // 保存请求的成功 / 失败由页面层知道。
+    //
+    // 子组件只观察“刚刚保存的是不是当前编辑的 Project”。
+    // 如果保存结束并且没有错误，就退出编辑态；
+    // 如果有错误，就保留用户输入，方便用户直接修改后重试。
+    if (
+      previousSavingProjectId &&
+      previousSavingProjectId === editingProjectId.value &&
+      savingProjectId === null &&
+      !props.projectMutationError
+    ) {
+      handleCancelEditProject();
+    }
+  }
+);
 
 function handleSubmitCreateProject() {
   const name = projectName.value.trim();
@@ -58,6 +81,7 @@ function handleStartEditProject(project: Project) {
   editingProjectId.value = project.id;
   editingProjectName.value = project.name;
   editingProjectDescription.value = project.description ?? "";
+  confirmingDeleteProjectId.value = null;
 }
 
 function handleCancelEditProject() {
@@ -79,14 +103,17 @@ function handleSaveProject(projectId: string) {
     name,
     description: description || undefined
   });
-  handleCancelEditProject();
 }
 
-function handleDeleteProject(projectId: string) {
-  if (!confirm("确定要删除这个 Project 吗？")) {
-    return;
-  }
+function handleStartDeleteProject(projectId: string) {
+  confirmingDeleteProjectId.value = projectId;
+}
 
+function handleCancelDeleteProject() {
+  confirmingDeleteProjectId.value = null;
+}
+
+function handleConfirmDeleteProject(projectId: string) {
   emit("deleteProject", projectId);
 }
 </script>
@@ -121,6 +148,9 @@ function handleDeleteProject(projectId: string) {
     <p v-if="props.projectListState.status === 'error'" class="error">
       {{ props.projectListState.message }}
     </p>
+    <p v-if="props.projectMutationError" class="project-mutation-error">
+      {{ props.projectMutationError }}
+    </p>
 
     <p
       v-if="
@@ -144,7 +174,14 @@ function handleDeleteProject(projectId: string) {
         <div v-if="editingProjectId === project.id" class="project-edit-form">
           <input v-model="editingProjectName" name="editingProjectName" type="text" />
           <input v-model="editingProjectDescription" name="editingProjectDescription" type="text" />
-          <button type="button" @click="handleSaveProject(project.id)">保存</button>
+          <button
+            type="button"
+            class="primary-action"
+            :disabled="props.savingProjectId === project.id"
+            @click="handleSaveProject(project.id)"
+          >
+            {{ props.savingProjectId === project.id ? "保存中..." : "保存" }}
+          </button>
           <button type="button" @click="handleCancelEditProject">取消</button>
         </div>
 
@@ -153,7 +190,35 @@ function handleDeleteProject(projectId: string) {
             {{ props.selectedProjectId === project.id ? "已选择" : "选择" }}
           </button>
           <button type="button" @click="handleStartEditProject(project)">编辑</button>
-          <button type="button" @click="handleDeleteProject(project.id)">删除</button>
+          <button
+            type="button"
+            class="danger-action"
+            :disabled="props.deletingProjectId === project.id"
+            @click="handleStartDeleteProject(project.id)"
+          >
+            删除
+          </button>
+        </div>
+
+        <div v-if="confirmingDeleteProjectId === project.id" class="project-delete-confirmation">
+          <p>确定删除这个 Project 吗？</p>
+          <div class="project-actions">
+            <button
+              type="button"
+              class="danger-action"
+              :disabled="props.deletingProjectId === project.id"
+              @click="handleConfirmDeleteProject(project.id)"
+            >
+              {{ props.deletingProjectId === project.id ? "删除中..." : "确认删除" }}
+            </button>
+            <button
+              type="button"
+              :disabled="props.deletingProjectId === project.id"
+              @click="handleCancelDeleteProject"
+            >
+              取消删除
+            </button>
+          </div>
         </div>
       </li>
     </ul>

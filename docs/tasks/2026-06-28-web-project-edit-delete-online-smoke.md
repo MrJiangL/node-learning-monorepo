@@ -301,21 +301,39 @@ npm run build -w @learn/web
 
 ## 完成标准
 
-- [ ] Netlify 已部署包含 Project 编辑 / 删除入口的新版本
-- [ ] 线上能登录并进入 `/projects`
-- [ ] 线上能创建临时 Project
-- [ ] 线上能编辑 Project name / description
-- [ ] 编辑后 Project 列表显示新名称
-- [ ] 编辑后 Activity Log 符合预期
-- [ ] 删除取消后 Project 仍然存在
-- [ ] 删除确认后 Project 从列表消失
-- [ ] 删除当前选中 Project 后 Todo 回到未选择状态
-- [ ] 删除当前选中 Project 后 Activity Log 回到未选择状态
-- [ ] 如失败，记录 `X-Request-Id`
-- [ ] 创建 docs/reviews/web-project-edit-delete-online-smoke.md
+- [x] Netlify 已部署包含 Project 编辑 / 删除入口的新版本
+- [x] 线上能登录并进入 `/projects`
+- [x] 线上能创建临时 Project
+- [x] 线上能编辑 Project name / description
+- [x] 编辑后 Project 列表显示新名称
+- [x] 编辑后 Activity Log 符合预期
+- [x] 删除取消后 Project 仍然存在
+- [x] 删除确认后 Project 从列表消失
+- [x] 删除当前选中 Project 后 Todo 回到未选择状态
+- [x] 删除当前选中 Project 后 Activity Log 回到未选择状态
+- [x] 如失败，记录 `X-Request-Id`
+- [x] 创建 docs/reviews/web-project-edit-delete-online-smoke.md
 
-完成后告诉我：
+## 完成记录
+
+- 完成时间：2026-06-28
+- 线上地址：https://scintillating-pavlova-dc76e0.netlify.app/projects
+- 复盘文档：docs/reviews/web-project-edit-delete-online-smoke.md
+- 线上 smoke 结果：
+  - Project 编辑入口在线上可用。
+  - Project 删除取消路径在线上可用。
+  - Project 删除确认路径在线上可用。
+  - 删除当前选中 Project 后，Todo / Activity Log 状态能回到未选择状态。
+  - 本次没有记录到需要排查的 `X-Request-Id`。
+- 下一步建议：
+  - 进入 Project 编辑删除体验优化。
+- 验证结果：
+  - npm run format:check 通过
+
+这张任务已经完成。
+
+下一步看：
 
 ```text
-Project 编辑删除线上 smoke 完成了
+docs/tasks/2026-06-28-web-project-edit-delete-experience-polish.md
 ```

@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils";
 import type { Project } from "@learn/shared";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { describe, expect, it } from "vitest";
 import ProjectListPanel from "../index.vue";
 
 function createProject(overrides: Partial<Project> = {}): Project {
@@ -16,10 +16,6 @@ function createProject(overrides: Partial<Project> = {}): Project {
 }
 
 describe("ProjectListPanel", () => {
-  afterEach(() => {
-    vi.unstubAllGlobals();
-  });
-
   it("idle 状态提示用户可以加载 Project", () => {
     const wrapper = mount(ProjectListPanel, {
       props: {
@@ -186,7 +182,7 @@ describe("ProjectListPanel", () => {
     expect(wrapper.text()).toContain("取消");
   });
 
-  it("保存编辑时会 emit saveProject 事件", async () => {
+  it("保存编辑时会 emit saveProject 事件并暂时保留编辑态", async () => {
     const wrapper = mount(ProjectListPanel, {
       props: {
         selectedProjectId: "project-1",
@@ -224,6 +220,103 @@ describe("ProjectListPanel", () => {
         }
       ]
     ]);
+    expect(wrapper.find('input[name="editingProjectName"]').exists()).toBe(true);
+  });
+
+  it("保存中时会禁用保存按钮并显示保存中文案", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        savingProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+
+    const saveButton = wrapper.findAll("button").find((button) => button.text() === "保存中...");
+
+    if (!saveButton) {
+      throw new Error("没有找到“保存中...”按钮");
+    }
+
+    expect(saveButton.attributes("disabled")).toBeDefined();
+  });
+
+  it("保存失败时保留编辑态、输入内容和错误提示", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        savingProjectId: null,
+        projectMutationError: "保存失败，请重试",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+    await wrapper.get('input[name="editingProjectName"]').setValue("失败后仍保留");
+    await wrapper.get('input[name="editingProjectDescription"]').setValue("不要清空输入");
+
+    const saveButton = wrapper.findAll("button").find((button) => button.text() === "保存");
+
+    if (!saveButton) {
+      throw new Error("没有找到“保存”按钮");
+    }
+
+    await saveButton.trigger("click");
+
+    expect(wrapper.get('input[name="editingProjectName"]').element).toHaveProperty(
+      "value",
+      "失败后仍保留"
+    );
+    expect(wrapper.get('input[name="editingProjectDescription"]').element).toHaveProperty(
+      "value",
+      "不要清空输入"
+    );
+    expect(wrapper.text()).toContain("保存失败，请重试");
+  });
+
+  it("保存成功后退出编辑状态", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        savingProjectId: null,
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+    await wrapper.setProps({ savingProjectId: "project-1" });
+    await wrapper.setProps({ savingProjectId: null, projectMutationError: null });
+
+    expect(wrapper.find('input[name="editingProjectName"]').exists()).toBe(false);
   });
 
   it("取消编辑时退出编辑状态且不 emit saveProject", async () => {
@@ -257,9 +350,7 @@ describe("ProjectListPanel", () => {
     expect(wrapper.emitted("saveProject")).toBeUndefined();
   });
 
-  it("确认删除时会 emit deleteProject 事件", async () => {
-    vi.stubGlobal("confirm", vi.fn().mockReturnValue(true));
-
+  it("点击删除后显示页面内确认区", async () => {
     const wrapper = mount(ProjectListPanel, {
       props: {
         selectedProjectId: "project-1",
@@ -278,16 +369,81 @@ describe("ProjectListPanel", () => {
 
     await deleteButton.trigger("click");
 
-    expect(confirm).toHaveBeenCalledWith("确定要删除这个 Project 吗？");
+    expect(wrapper.text()).toContain("确定删除这个 Project 吗？");
+    expect(wrapper.text()).toContain("确认删除");
+    expect(wrapper.text()).toContain("取消删除");
+  });
+
+  it("取消页面内删除确认时不会 emit deleteProject 事件", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const deleteButton = wrapper.findAll("button").find((button) => button.text() === "删除");
+
+    if (!deleteButton) {
+      throw new Error("没有找到“删除”按钮");
+    }
+
+    await deleteButton.trigger("click");
+
+    const cancelDeleteButton = wrapper
+      .findAll("button")
+      .find((button) => button.text() === "取消删除");
+
+    if (!cancelDeleteButton) {
+      throw new Error("没有找到“取消删除”按钮");
+    }
+
+    await cancelDeleteButton.trigger("click");
+
+    expect(wrapper.text()).not.toContain("确定删除这个 Project 吗？");
+    expect(wrapper.emitted("deleteProject")).toBeUndefined();
+  });
+
+  it("确认页面内删除时会 emit deleteProject 事件", async () => {
+    const wrapper = mount(ProjectListPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        projectListState: {
+          status: "success",
+          projects: [createProject()]
+        }
+      }
+    });
+
+    const deleteButton = wrapper.findAll("button").find((button) => button.text() === "删除");
+
+    if (!deleteButton) {
+      throw new Error("没有找到“删除”按钮");
+    }
+
+    await deleteButton.trigger("click");
+
+    const confirmDeleteButton = wrapper
+      .findAll("button")
+      .find((button) => button.text() === "确认删除");
+
+    if (!confirmDeleteButton) {
+      throw new Error("没有找到“确认删除”按钮");
+    }
+
+    await confirmDeleteButton.trigger("click");
+
     expect(wrapper.emitted("deleteProject")).toEqual([["project-1"]]);
   });
 
-  it("取消删除时不会 emit deleteProject 事件", async () => {
-    vi.stubGlobal("confirm", vi.fn().mockReturnValue(false));
-
+  it("删除中时会禁用确认删除按钮并显示删除中文案", async () => {
     const wrapper = mount(ProjectListPanel, {
       props: {
         selectedProjectId: "project-1",
+        deletingProjectId: null,
         projectListState: {
           status: "success",
           projects: [createProject()]
@@ -302,7 +458,16 @@ describe("ProjectListPanel", () => {
     }
 
     await deleteButton.trigger("click");
+    await wrapper.setProps({ deletingProjectId: "project-1" });
 
-    expect(wrapper.emitted("deleteProject")).toBeUndefined();
+    const deletingButton = wrapper
+      .findAll("button")
+      .find((button) => button.text() === "删除中...");
+
+    if (!deletingButton) {
+      throw new Error("没有找到“删除中...”按钮");
+    }
+
+    expect(deletingButton.attributes("disabled")).toBeDefined();
   });
 });

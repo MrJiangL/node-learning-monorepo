@@ -16,13 +16,28 @@ const props = defineProps<{
 const emit = defineEmits<{
   createTodo: [input: { title: string }];
   toggleTodo: [todo: Todo];
-  saveTodoTitle: [todoId: string, input: { title: string }];
+  saveTodo: [todoId: string, input: { title: string; dueDate: string | null }];
   deleteTodo: [todoId: string];
 }>();
 
 const todoTitle = ref("");
 const editingTodoId = ref<string | null>(null);
 const editingTodoTitle = ref("");
+const editingTodoDueDate = ref("");
+
+function formatTodoDueDate(dueDate: string | null): string {
+  if (!dueDate) {
+    return "暂无截止日期";
+  }
+
+  const formattedDate = new Intl.DateTimeFormat("zh-CN", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date(dueDate));
+
+  return `截止：${formattedDate}`;
+}
 
 function handleSubmitCreateTodo() {
   const title = todoTitle.value.trim();
@@ -45,14 +60,16 @@ function handleStartEditTodo(todo: Todo) {
   // 不需要让父组件知道，所以放在子组件里。
   editingTodoId.value = todo.id;
   editingTodoTitle.value = todo.title;
+  editingTodoDueDate.value = todo.dueDate ? todo.dueDate.slice(0, 10) : "";
 }
 
 function handleCancelEditTodo() {
   editingTodoId.value = null;
   editingTodoTitle.value = "";
+  editingTodoDueDate.value = "";
 }
 
-function handleSaveTodoTitle(todoId: string) {
+function handleSaveTodo(todoId: string) {
   const title = editingTodoTitle.value.trim();
 
   if (!title) {
@@ -60,7 +77,10 @@ function handleSaveTodoTitle(todoId: string) {
     return;
   }
 
-  emit("saveTodoTitle", todoId, { title });
+  emit("saveTodo", todoId, {
+    title,
+    dueDate: editingTodoDueDate.value || null
+  });
   handleCancelEditTodo();
 }
 </script>
@@ -92,11 +112,13 @@ function handleSaveTodoTitle(todoId: string) {
         <div v-if="editingTodoId !== todo.id">
           <strong>{{ todo.title }}</strong>
           <span>{{ todo.completed ? "已完成" : "未完成" }}</span>
+          <span>{{ formatTodoDueDate(todo.dueDate) }}</span>
         </div>
 
         <div v-if="editingTodoId === todo.id" class="todo-edit-form">
           <input v-model="editingTodoTitle" name="editingTodoTitle" type="text" />
-          <button type="button" @click="handleSaveTodoTitle(todo.id)">保存</button>
+          <input v-model="editingTodoDueDate" name="editingTodoDueDate" type="date" />
+          <button type="button" @click="handleSaveTodo(todo.id)">保存</button>
           <button type="button" @click="handleCancelEditTodo">取消</button>
         </div>
 

@@ -19,6 +19,13 @@ type UpdateProjectFormInput = {
   description?: string;
 };
 
+type ProjectMutationResult =
+  | { success: true }
+  | {
+      success: false;
+      message: string;
+    };
+
 export function useProjects() {
   const projectListState = ref<ProjectListState>({ status: "idle" });
 
@@ -69,45 +76,48 @@ export function useProjects() {
     await loadProjects();
   }
 
-  async function saveProject(projectId: string, input: UpdateProjectFormInput) {
+  async function saveProject(
+    projectId: string,
+    input: UpdateProjectFormInput
+  ): Promise<ProjectMutationResult> {
     const token = getAuthToken();
 
     if (!token) {
-      projectListState.value = {
-        status: "error",
+      return {
+        success: false,
         message: "请先登录，再更新 Project"
       };
-      return;
     }
 
     try {
       await updateProject(projectId, token, input);
       await loadProjects();
+      return { success: true };
     } catch (error) {
-      projectListState.value = {
-        status: "error",
+      return {
+        success: false,
         message: error instanceof Error ? error.message : "未知错误"
       };
     }
   }
 
-  async function deleteProjectFromList(projectId: string) {
+  async function deleteProjectFromList(projectId: string): Promise<ProjectMutationResult> {
     const token = getAuthToken();
 
     if (!token) {
-      projectListState.value = {
-        status: "error",
+      return {
+        success: false,
         message: "请先登录，再删除 Project"
       };
-      return;
     }
 
     try {
       await deleteProject(projectId, token);
       await loadProjects();
+      return { success: true };
     } catch (error) {
-      projectListState.value = {
-        status: "error",
+      return {
+        success: false,
         message: error instanceof Error ? error.message : "未知错误"
       };
     }

@@ -24,11 +24,14 @@ const {
   loadTodos,
   createTodoForProject,
   toggleTodo,
-  saveTodoTitle,
+  saveTodo,
   deleteTodoFromProject,
   resetTodos
 } = useTodos();
 const selectedProjectId = ref<string | null>(null);
+const savingProjectId = ref<string | null>(null);
+const deletingProjectId = ref<string | null>(null);
+const projectMutationError = ref<string | null>(null);
 
 async function handleSelectProject(projectId: string) {
   // selectedProjectId 是页面状态。
@@ -57,12 +60,12 @@ async function handleToggleTodo(todo: Todo) {
   await loadActivityLogs(selectedProjectId.value);
 }
 
-async function handleSaveTodoTitle(todoId: string, input: { title: string }) {
-  // 编辑标题后仍然重新加载当前 Project 的 Todo 列表。
+async function handleSaveTodo(todoId: string, input: { title: string; dueDate: string | null }) {
+  // 编辑 Todo 后仍然重新加载当前 Project 的 Todo 列表。
   //
-  // 这件事已经封装在 saveTodoTitle 里，
+  // 这件事已经封装在 saveTodo 里，
   // 页面只负责把事件参数转发过去。
-  await saveTodoTitle(selectedProjectId.value, todoId, input);
+  await saveTodo(selectedProjectId.value, todoId, input);
   await loadActivityLogs(selectedProjectId.value);
 }
 
@@ -75,17 +78,42 @@ async function handleDeleteTodo(todoId: string) {
 }
 
 async function handleSaveProject(projectId: string, input: { name: string; description?: string }) {
-  await saveProject(projectId, input);
-  await loadActivityLogs(projectId);
+  savingProjectId.value = projectId;
+  projectMutationError.value = null;
+
+  try {
+    const result = await saveProject(projectId, input);
+
+    if (!result.success) {
+      projectMutationError.value = result.message;
+      return;
+    }
+
+    await loadActivityLogs(projectId);
+  } finally {
+    savingProjectId.value = null;
+  }
 }
 
 async function handleDeleteProject(projectId: string) {
-  await deleteProjectFromList(projectId);
+  deletingProjectId.value = projectId;
+  projectMutationError.value = null;
 
-  if (selectedProjectId.value === projectId) {
-    selectedProjectId.value = null;
-    resetTodos();
-    resetActivityLogs();
+  try {
+    const result = await deleteProjectFromList(projectId);
+
+    if (!result.success) {
+      projectMutationError.value = result.message;
+      return;
+    }
+
+    if (selectedProjectId.value === projectId) {
+      selectedProjectId.value = null;
+      resetTodos();
+      resetActivityLogs();
+    }
+  } finally {
+    deletingProjectId.value = null;
   }
 }
 
@@ -103,6 +131,9 @@ async function handleLogout() {
     <ProjectListPanel
       :project-list-state="projectListState"
       :selected-project-id="selectedProjectId"
+      :saving-project-id="savingProjectId"
+      :deleting-project-id="deletingProjectId"
+      :project-mutation-error="projectMutationError"
       @load-projects="loadProjects"
       @logout="handleLogout"
       @select-project="handleSelectProject"
@@ -116,7 +147,7 @@ async function handleLogout() {
       :todo-list-state="todoListState"
       @create-todo="handleCreateTodo"
       @toggle-todo="handleToggleTodo"
-      @save-todo-title="handleSaveTodoTitle"
+      @save-todo="handleSaveTodo"
       @delete-todo="handleDeleteTodo"
     />
 

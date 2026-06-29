@@ -101,6 +101,28 @@
   font-weight: 700;
 }
 
+.project-list button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.project-list button.primary-action {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: white;
+}
+
+.project-list button.danger-action {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.project-list button.danger-action:hover:not(:disabled) {
+  border-color: #fca5a5;
+  background: #fee2e2;
+}
+
 .project-actions {
   display: flex;
   flex-wrap: wrap;
@@ -119,6 +141,29 @@
   border-radius: 8px;
   padding: 8px 10px;
   font: inherit;
+}
+
+.project-mutation-error {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.project-delete-confirmation {
+  display: grid;
+  gap: 8px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 10px;
+  background: #fef2f2;
+}
+
+.project-delete-confirmation p {
+  margin: 0;
+  color: #991b1b;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .todo-panel {

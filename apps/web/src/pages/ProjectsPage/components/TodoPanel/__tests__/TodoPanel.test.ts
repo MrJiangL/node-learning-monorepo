@@ -1,6 +1,21 @@
 import { mount } from "@vue/test-utils";
+import type { Todo } from "@learn/shared";
 import { describe, expect, it } from "vitest";
 import TodoPanel from "../index.vue";
+
+function createTodo(overrides: Partial<Todo> = {}): Todo {
+  return {
+    id: "todo-1",
+    projectId: "project-1",
+    title: "学习 emit",
+    description: null,
+    completed: false,
+    dueDate: null,
+    createdAt: "2026-06-02T00:00:00.000Z",
+    updatedAt: "2026-06-02T00:00:00.000Z",
+    ...overrides
+  };
+}
 
 describe("TodoPanel", () => {
   it("没有选中 Project 时提示先选择 Project", () => {
@@ -85,16 +100,7 @@ describe("TodoPanel", () => {
   });
 
   it("点击标记完成按钮时会 emit toggleTodo 事件", async () => {
-    const todo = {
-      id: "todo-1",
-      projectId: "project-1",
-      title: "学习 emit",
-      description: null,
-      completed: false,
-      dueDate: null,
-      createdAt: "2026-06-02T00:00:00.000Z",
-      updatedAt: "2026-06-02T00:00:00.000Z"
-    };
+    const todo = createTodo();
 
     const wrapper = mount(TodoPanel, {
       props: {
@@ -123,5 +129,154 @@ describe("TodoPanel", () => {
     // 因为 useTodos 需要根据 todo.completed 取反，
     // 再调用 PATCH /todos/:id。
     expect(wrapper.emitted("toggleTodo")).toEqual([[todo]]);
+  });
+
+  it("有 dueDate 时展示格式化后的截止日期", () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "success",
+          todos: [
+            createTodo({
+              dueDate: "2026-06-28T00:00:00.000Z"
+            })
+          ]
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("截止：2026/06/28");
+  });
+
+  it("没有 dueDate 时展示暂无截止日期", () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "success",
+          todos: [createTodo({ dueDate: null })]
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("暂无截止日期");
+  });
+
+  it("点击编辑时会把 dueDate 填入日期输入框", async () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "success",
+          todos: [
+            createTodo({
+              title: "有截止日期的 Todo",
+              dueDate: "2026-06-28T00:00:00.000Z"
+            })
+          ]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+
+    expect(wrapper.get('input[name="editingTodoTitle"]').element).toHaveProperty(
+      "value",
+      "有截止日期的 Todo"
+    );
+    expect(wrapper.get('input[name="editingTodoDueDate"]').element).toHaveProperty(
+      "value",
+      "2026-06-28"
+    );
+  });
+
+  it("保存编辑时会 emit saveTodo 事件并带上 title 和 dueDate", async () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "success",
+          todos: [createTodo()]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+    await wrapper.get('input[name="editingTodoTitle"]').setValue("更新 Todo");
+    await wrapper.get('input[name="editingTodoDueDate"]').setValue("2026-07-01");
+
+    const saveButton = wrapper.findAll("button").find((button) => button.text() === "保存");
+
+    if (!saveButton) {
+      throw new Error("没有找到“保存”按钮");
+    }
+
+    await saveButton.trigger("click");
+
+    expect(wrapper.emitted("saveTodo")).toEqual([
+      [
+        "todo-1",
+        {
+          title: "更新 Todo",
+          dueDate: "2026-07-01"
+        }
+      ]
+    ]);
+  });
+
+  it("清空 dueDate 后保存会 emit dueDate null", async () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "success",
+          todos: [
+            createTodo({
+              dueDate: "2026-06-28T00:00:00.000Z"
+            })
+          ]
+        }
+      }
+    });
+
+    const editButton = wrapper.findAll("button").find((button) => button.text() === "编辑");
+
+    if (!editButton) {
+      throw new Error("没有找到“编辑”按钮");
+    }
+
+    await editButton.trigger("click");
+    await wrapper.get('input[name="editingTodoDueDate"]').setValue("");
+
+    const saveButton = wrapper.findAll("button").find((button) => button.text() === "保存");
+
+    if (!saveButton) {
+      throw new Error("没有找到“保存”按钮");
+    }
+
+    await saveButton.trigger("click");
+
+    expect(wrapper.emitted("saveTodo")).toEqual([
+      [
+        "todo-1",
+        {
+          title: "学习 emit",
+          dueDate: null
+        }
+      ]
+    ]);
   });
 });

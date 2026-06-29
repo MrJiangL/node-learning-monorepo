@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTodos } from "../useTodos";
-import { fetchTodos } from "../../../../api/todos";
+import { fetchTodos, updateTodo } from "../../../../api/todos";
 import { getAuthToken } from "../../../../auth/token-storage";
 
 // useTodos 依赖 token-storage 判断当前用户是否已登录。
@@ -29,6 +29,7 @@ vi.mock("../../../../api/todos", () => ({
 // 不知道它运行时已经拥有 mockReturnValue 这些测试方法。
 const mockedGetAuthToken = vi.mocked(getAuthToken);
 const mockedFetchTodos = vi.mocked(fetchTodos);
+const mockedUpdateTodo = vi.mocked(updateTodo);
 
 describe("useTodos", () => {
   beforeEach(() => {
@@ -121,6 +122,85 @@ describe("useTodos", () => {
 
     expect(todoListState.value).toEqual({
       status: "idle"
+    });
+  });
+
+  it("保存 Todo 时会调用 updateTodo 并带上 title 和 dueDate", async () => {
+    mockedGetAuthToken.mockReturnValue("test-token");
+    mockedUpdateTodo.mockResolvedValue({
+      success: true,
+      data: {
+        id: "todo-1",
+        projectId: "project-1",
+        title: "更新 Todo",
+        description: null,
+        completed: false,
+        dueDate: "2026-07-01T00:00:00.000Z",
+        createdAt: "2026-06-02T00:00:00.000Z",
+        updatedAt: "2026-06-28T00:00:00.000Z"
+      }
+    });
+    mockedFetchTodos.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
+      }
+    });
+
+    const { saveTodo } = useTodos();
+
+    await saveTodo("project-1", "todo-1", {
+      title: "更新 Todo",
+      dueDate: "2026-07-01"
+    });
+
+    expect(mockedUpdateTodo).toHaveBeenCalledWith("todo-1", "test-token", {
+      title: "更新 Todo",
+      dueDate: "2026-07-01"
+    });
+    expect(mockedFetchTodos).toHaveBeenCalledWith("project-1", "test-token");
+  });
+
+  it("保存 Todo 时可以传 dueDate null 清空截止日期", async () => {
+    mockedGetAuthToken.mockReturnValue("test-token");
+    mockedUpdateTodo.mockResolvedValue({
+      success: true,
+      data: {
+        id: "todo-1",
+        projectId: "project-1",
+        title: "更新 Todo",
+        description: null,
+        completed: false,
+        dueDate: null,
+        createdAt: "2026-06-02T00:00:00.000Z",
+        updatedAt: "2026-06-28T00:00:00.000Z"
+      }
+    });
+    mockedFetchTodos.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
+      }
+    });
+
+    const { saveTodo } = useTodos();
+
+    await saveTodo("project-1", "todo-1", {
+      title: "更新 Todo",
+      dueDate: null
+    });
+
+    expect(mockedUpdateTodo).toHaveBeenCalledWith("todo-1", "test-token", {
+      title: "更新 Todo",
+      dueDate: null
     });
   });
 });

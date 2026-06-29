@@ -231,17 +231,23 @@ Task 5: Prisma Persistence With MySQL
 - Activity Log 前端展示线上 smoke：`docs/tasks/2026-06-28-web-activity-log-online-smoke.md`
 - 前端业务功能：Project 编辑和删除入口：`docs/tasks/2026-06-28-web-project-edit-delete.md`
 - Project 编辑删除 smoke 和复盘：`docs/tasks/2026-06-28-web-project-edit-delete-smoke-retrospective.md`
+- Project 编辑删除线上 smoke：`docs/tasks/2026-06-28-web-project-edit-delete-online-smoke.md`
+- Project 编辑删除体验优化：`docs/tasks/2026-06-28-web-project-edit-delete-experience-polish.md`
+- Project 编辑删除体验优化 smoke 和复盘：`docs/tasks/2026-06-28-web-project-edit-delete-experience-smoke-retrospective.md`
+- Project 编辑删除体验优化线上 smoke：`docs/tasks/2026-06-28-web-project-edit-delete-experience-online-smoke.md`
+- Todo dueDate 展示和编辑：`docs/tasks/2026-06-28-web-todo-due-date-display-edit.md`
+- Todo dueDate smoke 和复盘：`docs/tasks/2026-06-28-web-todo-due-date-smoke-retrospective.md`
 
 ## Current
 
-- Project 编辑删除线上 smoke：`docs/tasks/2026-06-28-web-project-edit-delete-online-smoke.md`
+- Todo dueDate 线上 smoke：`docs/tasks/2026-06-29-web-todo-due-date-online-smoke.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. Project 编辑删除线上 smoke
-2. 线上 smoke 复盘后，选择继续业务功能还是体验打磨
+1. Todo dueDate 线上 smoke
+2. 线上 smoke 复盘后，再选择用户级 Activity Log，还是 Todo dueDate 进阶体验
 
 ## Working Agreement
 
