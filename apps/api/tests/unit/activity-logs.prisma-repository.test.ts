@@ -333,4 +333,66 @@ describe("prisma activity log repository", () => {
     expect(result.data.map((log) => log.message)).toEqual(["应该返回的日志"]);
     expect(result.meta.total).toBe(1);
   });
+
+  it("不传 projectId 时返回当前用户跨 Project 的 Activity Logs", async () => {
+    const repository = createPrismaActivityLogRepository();
+    const owner = await createFactoryUser({
+      email: "activity-log-user-level-owner@example.com"
+    });
+    const anotherUser = await createFactoryUser({
+      email: "activity-log-user-level-other@example.com"
+    });
+    const firstProject = await createFactoryProject({
+      userId: owner.id,
+      name: "First Project"
+    });
+    const secondProject = await createFactoryProject({
+      userId: owner.id,
+      name: "Second Project"
+    });
+    const anotherProject = await createFactoryProject({
+      userId: anotherUser.id,
+      name: "Another User Project"
+    });
+
+    await createFactoryActivityLog({
+      userId: owner.id,
+      projectId: firstProject.id,
+      action: "project.created",
+      message: "Owner 第一条日志",
+      createdAt: new Date("2026-06-01T00:00:00.000Z")
+    });
+    await createFactoryActivityLog({
+      userId: owner.id,
+      projectId: secondProject.id,
+      action: "todo.updated",
+      message: "Owner 第二条日志",
+      createdAt: new Date("2026-06-02T00:00:00.000Z")
+    });
+    await createFactoryActivityLog({
+      userId: anotherUser.id,
+      projectId: anotherProject.id,
+      action: "project.created",
+      message: "Other 用户日志",
+      createdAt: new Date("2026-06-03T00:00:00.000Z")
+    });
+
+    const result = await repository.findAll({
+      userId: owner.id,
+      page: 1,
+      pageSize: 10
+    });
+
+    expect(result.data.map((log) => log.message)).toEqual(["Owner 第二条日志", "Owner 第一条日志"]);
+    expect(result.data.every((log) => log.userId === owner.id)).toBe(true);
+    expect(result.data.map((log) => log.projectSnapshotId).sort()).toEqual(
+      [firstProject.id, secondProject.id].sort()
+    );
+    expect(result.meta).toEqual({
+      page: 1,
+      pageSize: 10,
+      total: 2,
+      totalPages: 1
+    });
+  });
 });

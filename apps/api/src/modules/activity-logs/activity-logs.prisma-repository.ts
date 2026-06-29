@@ -55,7 +55,7 @@ export function createPrismaActivityLogRepository(): ActivityLogRepository {
             }
           : undefined;
 
-      const where = {
+      const where: Prisma.ActivityLogWhereInput = {
         // 这是这张任务最重要的查询边界。
         //
         // Project 删除后，ActivityLog.projectId 会被数据库设置成 null，
@@ -66,7 +66,7 @@ export function createPrismaActivityLogRepository(): ActivityLogRepository {
         //
         // userId 也必须保留：它是“当前用户只能看自己的日志”的权限边界。
         userId: filter.userId,
-        projectSnapshotId: filter.projectId,
+        ...(filter.projectId ? { projectSnapshotId: filter.projectId } : {}),
         action: filter.action,
         createdAt
       };

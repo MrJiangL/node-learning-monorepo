@@ -39,7 +39,9 @@ export type CreateActivityLogInput = {
 
 export type ListActivityLogsFilter = {
   // 只查询某一个 Project 的活动日志。
-  projectId: string;
+  //
+  // 不传 projectId 时，表示查询当前用户自己的全部 Activity Log。
+  projectId?: string;
 
   // userId 用来做权限边界。
   //

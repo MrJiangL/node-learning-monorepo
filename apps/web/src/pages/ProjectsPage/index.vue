@@ -6,9 +6,11 @@ import { clearAuthToken } from "../../auth/token-storage";
 import ActivityLogPanel from "./components/ActivityLogPanel/index.vue";
 import ProjectListPanel from "./components/ProjectListPanel/index.vue";
 import TodoPanel from "./components/TodoPanel/index.vue";
+import UserActivityLogPanel from "./components/UserActivityLogPanel/index.vue";
 import { useActivityLogs } from "./composables/useActivityLogs";
 import { useProjects } from "./composables/useProjects";
 import { useTodos } from "./composables/useTodos";
+import { useUserActivityLogs } from "./composables/useUserActivityLogs";
 
 const router = useRouter();
 const {
@@ -32,6 +34,7 @@ const selectedProjectId = ref<string | null>(null);
 const savingProjectId = ref<string | null>(null);
 const deletingProjectId = ref<string | null>(null);
 const projectMutationError = ref<string | null>(null);
+const { userActivityLogListState, loadUserActivityLogs } = useUserActivityLogs();
 
 async function handleSelectProject(projectId: string) {
   // selectedProjectId 是页面状态。
@@ -155,6 +158,11 @@ async function handleLogout() {
       :selected-project-id="selectedProjectId"
       :activity-log-list-state="activityLogListState"
       @load-activity-logs="loadActivityLogs(selectedProjectId)"
+    />
+
+    <UserActivityLogPanel
+      :user-activity-log-list-state="userActivityLogListState"
+      @load-user-activity-logs="loadUserActivityLogs"
     />
   </main>
 </template>

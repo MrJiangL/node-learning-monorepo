@@ -287,6 +287,35 @@ curl "http://localhost:3001/plans?page=1&pageSize=2" \
 - `pageSize` 表示每页多少条，目前最大值是 50。
 - 分页信息会放在响应里的 `meta` 字段。
 
+## 查询当前用户的 Activity Log
+
+请求：
+
+```bash
+curl "http://localhost:3001/activity-logs?page=1&pageSize=10" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+说明：
+
+- 这个接口返回当前登录用户自己的所有 Activity Log。
+- 客户端不需要传 `userId`，也不应该通过 query 参数决定要查谁的日志。
+- 后端会从 token 里识别当前用户，并用 `currentUser.id` 作为权限边界。
+- 响应里的分页信息仍然放在 `meta` 字段。
+
+如果只想看某类日志，可以加 `action`：
+
+```bash
+curl "http://localhost:3001/activity-logs?action=todo.updated&page=1&pageSize=10" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+学习点：
+
+- `GET /projects/:projectId/activity-logs` 适合 Project 详情页。
+- `GET /activity-logs` 适合“我的最近操作”这种用户级视角。
+- 两个接口都必须使用当前登录用户做权限边界。
+
 ## 触发未登录错误
 
 请求：

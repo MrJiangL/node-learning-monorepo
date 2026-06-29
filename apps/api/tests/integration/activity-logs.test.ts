@@ -23,6 +23,15 @@ describe("activity logs API", () => {
     expect(response.body.error.code).toBe("AUTH_REQUIRED");
   });
 
+  it("未登录不能查看用户级活动记录", async () => {
+    const app = createApp();
+
+    const response = await request(app).get("/activity-logs");
+
+    expect(response.status).toBe(401);
+    expect(response.body.error.code).toBe("AUTH_REQUIRED");
+  });
+
   it("当前用户可以查看自己 Project 下的活动记录", async () => {
     const app = createApp();
     const auth = await registerAndLogin(app, "activity-log-owner@example.com");
@@ -47,6 +56,84 @@ describe("activity logs API", () => {
     expect(actions).toContain("todo.created");
     expect(actions).toContain("todo.completed");
     expect(response.body.meta.total).toBe(3);
+  });
+
+  it("当前用户可以查看自己跨 Project 的活动记录", async () => {
+    const app = createApp();
+    const owner = await registerAndLogin(app, "activity-log-user-feed-owner@example.com");
+    const anotherUser = await registerAndLogin(app, "activity-log-user-feed-other@example.com");
+
+    const firstProject = await createProject(app, owner.token, "First Feed Project");
+    const secondProject = await createProject(app, owner.token, "Second Feed Project");
+    const anotherProject = await createProject(app, anotherUser.token, "Other Feed Project");
+
+    await createTodo(app, owner.token, firstProject.id, "Owner first todo");
+    await createTodo(app, owner.token, secondProject.id, "Owner second todo");
+    await createTodo(app, anotherUser.token, anotherProject.id, "Other todo");
+
+    const response = await request(app).get("/activity-logs").set(authHeader(owner.token));
+    const messages = response.body.data.map((log: { message: string }) => log.message);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(messages.some((message: string) => message.includes("First Feed Project"))).toBe(true);
+    expect(messages.some((message: string) => message.includes("Second Feed Project"))).toBe(true);
+    expect(messages.some((message: string) => message.includes("Other Feed Project"))).toBe(false);
+    expect(
+      response.body.data.every((log: { userId: string }) => log.userId === owner.user.id)
+    ).toBe(true);
+  });
+
+  it("用户级活动记录支持分页和 action 过滤", async () => {
+    const app = createApp();
+    const auth = await registerAndLogin(app, "activity-log-user-feed-filter@example.com");
+    const firstProject = await createProject(app, auth.token, "Filtered Feed Project");
+    const secondProject = await createProject(app, auth.token, "Filtered Feed Project 2");
+
+    await createTodo(app, auth.token, firstProject.id, "First filtered todo");
+    await createTodo(app, auth.token, secondProject.id, "Second filtered todo");
+
+    const response = await request(app)
+      .get("/activity-logs?action=todo.created&page=1&pageSize=1")
+      .set(authHeader(auth.token));
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.data).toHaveLength(1);
+    expect(response.body.data[0].action).toBe("todo.created");
+    expect(response.body.meta).toEqual({
+      page: 1,
+      pageSize: 1,
+      total: 2,
+      totalPages: 2
+    });
+  });
+
+  it("用户级活动记录不会允许 query userId 越权查看别人日志", async () => {
+    const app = createApp();
+    const owner = await registerAndLogin(app, "activity-log-userid-owner@example.com");
+    const anotherUser = await registerAndLogin(app, "activity-log-userid-other@example.com");
+    const ownerProject = await createProject(app, owner.token, "Owner UserId Project");
+    const anotherProject = await createProject(app, anotherUser.token, "Other UserId Project");
+
+    await createTodo(app, owner.token, ownerProject.id, "Owner todo");
+    await createTodo(app, anotherUser.token, anotherProject.id, "Other todo");
+
+    const response = await request(app)
+      .get(`/activity-logs?userId=${anotherUser.user.id}`)
+      .set(authHeader(owner.token));
+
+    const messages = response.body.data.map((log: { message: string }) => log.message);
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(messages.some((message: string) => message.includes("Owner UserId Project"))).toBe(true);
+    expect(messages.some((message: string) => message.includes("Other UserId Project"))).toBe(
+      false
+    );
+    expect(
+      response.body.data.every((log: { userId: string }) => log.userId === owner.user.id)
+    ).toBe(true);
   });
 
   it("不能查看别人的 Project 活动记录", async () => {

@@ -41,7 +41,7 @@ function createFakeRepository(): ActivityLogRepository {
           data: [
             createFakeActivityLog({
               userId: filter.userId,
-              projectId: filter.projectId
+              projectId: filter.projectId ?? "project-1"
             })
           ],
           meta: {
@@ -280,6 +280,59 @@ describe("activity log service", () => {
       createdAfter: "2026-06-01T00:00:00.000Z",
       createdBefore: "2026-06-30T23:59:59.999Z",
       page: 1,
+      pageSize: 10
+    });
+  });
+
+  it("查询用户级活动记录时只用 userId 作为权限边界，不传 projectId", async () => {
+    const repository = createFakeRepository();
+    const service = createActivityLogService(repository);
+
+    const result = await service.listUserLogs({
+      userId: "user-1",
+      page: 1,
+      pageSize: 20
+    });
+
+    // 用户级 Activity Log 的重点是“当前用户的所有日志”。
+    //
+    // 所以 service 不能伪造一个 projectId，也不能从外部接收 userId。
+    // route 层后面会从 currentUser.id 传 userId 进来。
+    expect(repository.findAll).toHaveBeenCalledWith({
+      userId: "user-1",
+      action: undefined,
+      createdAfter: undefined,
+      createdBefore: undefined,
+      page: 1,
+      pageSize: 20
+    });
+    expect(result.meta).toEqual({
+      page: 1,
+      pageSize: 20,
+      total: 1,
+      totalPages: 1
+    });
+  });
+
+  it("查询用户级活动记录时会传递 action 和时间范围过滤条件", async () => {
+    const repository = createFakeRepository();
+    const service = createActivityLogService(repository);
+
+    await service.listUserLogs({
+      userId: "user-1",
+      action: "todo.updated",
+      createdAfter: "2026-06-01T00:00:00.000Z",
+      createdBefore: "2026-06-30T23:59:59.999Z",
+      page: 2,
+      pageSize: 10
+    });
+
+    expect(repository.findAll).toHaveBeenCalledWith({
+      userId: "user-1",
+      action: "todo.updated",
+      createdAfter: "2026-06-01T00:00:00.000Z",
+      createdBefore: "2026-06-30T23:59:59.999Z",
+      page: 2,
       pageSize: 10
     });
   });

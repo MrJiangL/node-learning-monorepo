@@ -29,3 +29,21 @@ export async function fetchActivityLogs(
 
   return response.json() as Promise<ListActivityLogsResponse>;
 }
+
+export async function fetchUserActivityLogs(token: string): Promise<ListActivityLogsResponse> {
+  // 用户级 Activity Log 不依赖当前选中的 Project。
+  //
+  // 后端会根据 Authorization header 里的 token 识别当前用户，
+  // 并只返回这个用户自己的日志。
+  const response = await authenticatedFetch(buildApiUrl("/activity-logs"), {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!response.ok) {
+    throw await parseApiError(response, "加载最近操作失败");
+  }
+
+  return response.json() as Promise<ListActivityLogsResponse>;
+}

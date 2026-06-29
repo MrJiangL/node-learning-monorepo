@@ -11,6 +11,35 @@ export function createActivityLogsRouter() {
   const activityLogService = createActivityLogService(createPrismaActivityLogRepository());
 
   router.get(
+    "/activity-logs",
+    requireAuth,
+    asyncHandler(async (request, response) => {
+      try {
+        // 用户级 Activity Log 查询仍然只使用当前登录用户的 id。
+        //
+        // 即使客户端在 query 里传 userId，也不能影响查询边界。
+        const query = listActivityLogsQuerySchema.parse(request.query);
+        const result = await activityLogService.listUserLogs({
+          userId: request.user!.id,
+          action: query.action,
+          createdAfter: query.createdAfter,
+          createdBefore: query.createdBefore,
+          page: query.page,
+          pageSize: query.pageSize
+        });
+
+        response.json({
+          success: true,
+          data: result.data,
+          meta: result.meta
+        });
+      } catch (error) {
+        mapZodErrorToAppError(error, "query");
+      }
+    })
+  );
+
+  router.get(
     "/projects/:projectId/activity-logs",
     requireAuth,
     asyncHandler(async (request, response) => {

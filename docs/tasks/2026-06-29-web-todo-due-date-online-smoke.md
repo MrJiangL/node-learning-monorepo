@@ -259,18 +259,36 @@ npm run build -w @learn/web
 
 ## 完成标准
 
-- [ ] Netlify 已部署包含 Todo dueDate 的前端版本
-- [ ] 线上能登录并进入 `/projects`
-- [ ] 线上 Todo 无 dueDate 时展示“暂无截止日期”
-- [ ] 线上 Todo 有 dueDate 时展示“截止：YYYY/MM/DD”
-- [ ] 线上能编辑 Todo dueDate
-- [ ] 线上能清空 Todo dueDate
-- [ ] dueDate 更新后 Activity Log 符合预期
-- [ ] 如失败，记录 `X-Request-Id`
-- [ ] 创建 docs/reviews/web-todo-due-date-online-smoke.md
+- [x] Netlify 已部署包含 Todo dueDate 的前端版本
+- [x] 线上能登录并进入 `/projects`
+- [x] 线上 Todo 无 dueDate 时展示“暂无截止日期”
+- [x] 线上 Todo 有 dueDate 时展示“截止：YYYY/MM/DD”
+- [x] 线上能编辑 Todo dueDate
+- [x] 线上能清空 Todo dueDate
+- [x] dueDate 更新后 Activity Log 符合预期
+- [x] 如失败，记录 `X-Request-Id`
+- [x] 创建 docs/reviews/web-todo-due-date-online-smoke.md
 
-完成后告诉我：
+## 完成记录
+
+- 完成时间：2026-06-29
+- 线上地址：https://scintillating-pavlova-dc76e0.netlify.app/projects
+- 复盘文档：docs/reviews/web-todo-due-date-online-smoke.md
+- 线上 smoke 结果：
+  - Todo dueDate 展示在线上正常。
+  - Todo dueDate 更新在线上正常。
+  - Todo dueDate 清空在线上正常。
+  - Activity Log 符合当前阶段预期。
+  - 本次没有记录到需要排查的 `X-Request-Id`。
+- 下一步建议：
+  - 进入用户级 Activity Log 查询 API。
+- 验证结果：
+  - npm run format:check 通过
+
+这张任务已经完成。
+
+下一步看：
 
 ```text
-Todo dueDate 线上 smoke 完成了
+docs/tasks/2026-06-29-user-activity-log-query-api.md
 ```

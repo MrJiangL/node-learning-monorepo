@@ -26,9 +26,19 @@ export type ListProjectActivityLogsInput = {
   pageSize: number;
 };
 
+export type ListUserActivityLogsInput = {
+  userId: string;
+  page: number;
+  action?: ActivityLogAction;
+  createdAfter?: string;
+  createdBefore?: string;
+  pageSize: number;
+};
+
 export type ActivityLogService = {
   record(input: RecordActivityLogInput): Promise<ActivityLog>;
   listProjectLogs(input: ListProjectActivityLogsInput): Promise<PaginatedResult<ActivityLog>>;
+  listUserLogs(input: ListUserActivityLogsInput): Promise<PaginatedResult<ActivityLog>>;
 };
 
 export function createActivityLogService(repository: ActivityLogRepository): ActivityLogService {
@@ -75,6 +85,23 @@ export function createActivityLogService(repository: ActivityLogRepository): Act
       const filter: ListActivityLogsFilter = {
         userId: input.userId,
         projectId: input.projectId,
+        action: input.action,
+        createdAfter: input.createdAfter,
+        createdBefore: input.createdBefore,
+        page: input.page,
+        pageSize: input.pageSize
+      };
+
+      return repository.findAll(filter);
+    },
+
+    async listUserLogs(input: ListUserActivityLogsInput) {
+      // 用户级查询仍然必须用 userId 做权限边界。
+      //
+      // 不传 projectId 表示“当前用户自己的所有 Project / Todo 操作日志”，
+      // 而不是“系统里所有用户的日志”。
+      const filter: ListActivityLogsFilter = {
+        userId: input.userId,
         action: input.action,
         createdAfter: input.createdAfter,
         createdBefore: input.createdBefore,

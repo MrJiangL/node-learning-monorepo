@@ -182,6 +182,17 @@ function createFakeActivityLogService(): ActivityLogService & {
           totalPages: 0
         }
       };
+    },
+    async listUserLogs() {
+      return {
+        data: [],
+        meta: {
+          page: 1,
+          pageSize: 10,
+          total: 0,
+          totalPages: 0
+        }
+      };
     }
   };
 }

@@ -237,17 +237,20 @@ Task 5: Prisma Persistence With MySQL
 - Project 编辑删除体验优化线上 smoke：`docs/tasks/2026-06-28-web-project-edit-delete-experience-online-smoke.md`
 - Todo dueDate 展示和编辑：`docs/tasks/2026-06-28-web-todo-due-date-display-edit.md`
 - Todo dueDate smoke 和复盘：`docs/tasks/2026-06-28-web-todo-due-date-smoke-retrospective.md`
+- Todo dueDate 线上 smoke：`docs/tasks/2026-06-29-web-todo-due-date-online-smoke.md`
+- 用户级 Activity Log 查询 API：`docs/tasks/2026-06-29-user-activity-log-query-api.md`
+- 用户级 Activity Log 前端入口：`docs/tasks/2026-06-29-web-user-activity-log-entry.md`
 
 ## Current
 
-- Todo dueDate 线上 smoke：`docs/tasks/2026-06-29-web-todo-due-date-online-smoke.md`
+- 用户级 Activity Log 前端入口 smoke 和复盘：`docs/tasks/2026-06-29-web-user-activity-log-smoke-retrospective.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. Todo dueDate 线上 smoke
-2. 线上 smoke 复盘后，再选择用户级 Activity Log，还是 Todo dueDate 进阶体验
+1. 用户级 Activity Log 前端入口 smoke 和复盘
+2. 选择部署上线 smoke、体验优化，还是 metadata 展示
 
 ## Working Agreement
 
