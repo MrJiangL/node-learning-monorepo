@@ -53,7 +53,7 @@ describe("activity log display helpers", () => {
     expect(result).toBe("Todo：学习 metadata");
   });
 
-  it("把 todo.updated metadata 格式化成 Todo 标题和变更字段摘要", () => {
+  it("把 todo.updated metadata 格式化成 Todo 标题和中文变更字段摘要", () => {
     const result = formatActivityLogMetadata(
       createActivityLog({
         action: "todo.updated",
@@ -65,10 +65,10 @@ describe("activity log display helpers", () => {
       })
     );
 
-    expect(result).toBe("Todo：学习 dueDate；变更字段：title、dueDate");
+    expect(result).toBe("Todo：学习 dueDate；变更字段：标题、截止日期");
   });
 
-  it("把 project.updated metadata 格式化成 Project 名称和变更字段摘要", () => {
+  it("把 project.updated metadata 格式化成 Project 名称和中文变更字段摘要", () => {
     const result = formatActivityLogMetadata(
       createActivityLog({
         action: "project.updated",
@@ -79,7 +79,22 @@ describe("activity log display helpers", () => {
       })
     );
 
-    expect(result).toBe("Project：学习项目；变更字段：name、description");
+    expect(result).toBe("Project：学习项目；变更字段：名称、描述");
+  });
+
+  it("把 completed 映射成完成状态，未知字段保留原样", () => {
+    const result = formatActivityLogMetadata(
+      createActivityLog({
+        action: "todo.completed",
+        metadata: {
+          todoId: "todo-1",
+          title: "学习字段翻译",
+          changedFields: ["completed", "customField"]
+        }
+      })
+    );
+
+    expect(result).toBe("Todo：学习字段翻译；变更字段：完成状态、customField");
   });
 
   it("metadata 为 null 时返回 null", () => {

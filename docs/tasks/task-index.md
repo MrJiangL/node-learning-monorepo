@@ -247,17 +247,20 @@ Task 5: Prisma Persistence With MySQL
 - 用户级 Activity Log 体验优化线上 smoke：`docs/tasks/2026-06-30-web-user-activity-log-experience-online-smoke.md`
 - Activity Log metadata 前端展示：`docs/tasks/2026-06-30-web-activity-log-metadata-display.md`
 - Activity Log metadata 展示 smoke 和复盘：`docs/tasks/2026-06-30-web-activity-log-metadata-smoke-retrospective.md`
+- Activity Log metadata 展示线上 smoke：`docs/tasks/2026-06-30-web-activity-log-metadata-online-smoke.md`
+- Activity Log metadata 展示增强：`docs/tasks/2026-06-30-web-activity-log-metadata-display-polish.md`
 
 ## Current
 
-- Activity Log metadata 展示线上 smoke：`docs/tasks/2026-06-30-web-activity-log-metadata-online-smoke.md`
+- Activity Log metadata 展示增强 smoke 和复盘：`docs/tasks/2026-06-30-web-activity-log-metadata-display-polish-smoke-retrospective.md`
 
 ## Next
 
 完成当前任务后，继续按这个顺序走：
 
-1. Activity Log metadata 展示线上 smoke
-2. 再选择 metadata 展示增强或下一组业务功能
+1. Activity Log metadata 展示增强 smoke 和复盘
+2. Activity Log metadata 展示增强线上 smoke
+3. 再选择 Activity Log 阶段总复盘或下一组业务功能
 
 ## Working Agreement
 

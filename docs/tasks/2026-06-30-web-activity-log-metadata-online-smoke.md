@@ -189,18 +189,40 @@ docs/reviews/web-activity-log-metadata-online-smoke.md
 
 ## 完成标准
 
-- [ ] 部署前本地验证通过
-- [ ] Netlify 部署成功
-- [ ] Project 级 Activity Log 能展示 metadata 摘要
-- [ ] 用户级 Activity Log 能展示 metadata 摘要
-- [ ] 更新类日志能展示 changedFields
-- [ ] 旧日志没有 metadata 时不会出现 `undefined`
-- [ ] 页面没有出现 `[object Object]`
-- [ ] 创建 `docs/reviews/web-activity-log-metadata-online-smoke.md`
-- [ ] npm run format:check 通过
+- [x] 部署前本地验证通过
+- [x] Netlify 部署成功
+- [x] Project 级 Activity Log 能展示 metadata 摘要
+- [x] 用户级 Activity Log 能展示 metadata 摘要
+- [x] 更新类日志能展示 changedFields
+- [x] 旧日志没有 metadata 时不会出现 `undefined`
+- [x] 页面没有出现 `[object Object]`
+- [x] 创建 `docs/reviews/web-activity-log-metadata-online-smoke.md`
+- [x] npm run format:check 通过
 
-完成后告诉我：
+## 完成记录
+
+- 完成时间：2026-06-30
+- 线上地址：`https://scintillating-pavlova-dc76e0.netlify.app/projects`
+- 复盘文档：`docs/reviews/web-activity-log-metadata-online-smoke.md`
+- 验证结论：
+  - Activity Log metadata 展示已经完成线上 smoke。
+  - Project 级和用户级 Activity Log 都能展示 metadata 摘要。
+  - 更新类日志能展示 changedFields。
+  - 旧日志没有 metadata 时不会出现 `undefined`。
+  - 页面没有出现 `[object Object]`。
+- 下一阶段选择：
+  - Activity Log metadata 展示增强
+- 选择原因：
+  - metadata 展示已经安全上线。
+  - 当前 changedFields 仍然偏开发者字段名。
+  - 下一步把 `title` / `dueDate` / `completed` 翻译成中文字段名，能明显提升产品感。
+- 验证结果：
+  - `npm run format:check` 通过
+
+这张任务已经完成。
+
+下一步看：
 
 ```text
-Activity Log metadata 展示线上 smoke 完成了
+docs/tasks/2026-06-30-web-activity-log-metadata-display-polish.md
 ```

@@ -124,7 +124,7 @@ describe("UserActivityLogPanel", () => {
     expect(wrapper.get("time").attributes("datetime")).toBe("2026-06-29T11:30:00.000Z");
   });
 
-  it("success 时展示 metadata 摘要", () => {
+  it("success 时展示中文字段名 metadata 摘要", () => {
     const wrapper = mount(UserActivityLogPanel, {
       props: {
         userActivityLogListState: {
@@ -143,7 +143,9 @@ describe("UserActivityLogPanel", () => {
       }
     });
 
-    expect(wrapper.text()).toContain("Project：学习项目；变更字段：name、description");
+    expect(wrapper.text()).toContain("Project：学习项目；变更字段：名称、描述");
+    expect(wrapper.text()).not.toContain("name");
+    expect(wrapper.text()).not.toContain("description");
   });
 
   it("metadata 缺失时不会展示 undefined", () => {

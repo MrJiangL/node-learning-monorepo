@@ -10,6 +10,14 @@ const actionLabelMap: Record<ActivityLogAction, string> = {
   "todo.deleted": "删除 Todo"
 };
 
+const changedFieldLabelMap: Record<string, string> = {
+  completed: "完成状态",
+  description: "描述",
+  dueDate: "截止日期",
+  name: "名称",
+  title: "标题"
+};
+
 export function formatActivityLogAction(action: ActivityLogAction): string {
   return actionLabelMap[action];
 }
@@ -47,7 +55,13 @@ function readStringArray(metadata: Record<string, unknown>, key: string): string
 function formatChangedFields(metadata: Record<string, unknown>): string | null {
   const changedFields = readStringArray(metadata, "changedFields");
 
-  return changedFields ? `；变更字段：${changedFields.join("、")}` : null;
+  return changedFields
+    ? `；变更字段：${changedFields.map(formatActivityLogChangedField).join("、")}`
+    : null;
+}
+
+function formatActivityLogChangedField(field: string): string {
+  return changedFieldLabelMap[field] ?? field;
 }
 
 function formatProjectMetadata(

@@ -104,7 +104,7 @@ describe("ActivityLogPanel", () => {
     expect(wrapper.get("time").attributes("datetime")).toBe("2026-06-28T11:30:00.000Z");
   });
 
-  it("success 时展示 metadata 摘要", () => {
+  it("success 时展示中文字段名 metadata 摘要", () => {
     const wrapper = mount(ActivityLogPanel, {
       props: {
         selectedProjectId: "project-1",
@@ -125,7 +125,9 @@ describe("ActivityLogPanel", () => {
       }
     });
 
-    expect(wrapper.text()).toContain("Todo：学习 metadata；变更字段：title、dueDate");
+    expect(wrapper.text()).toContain("Todo：学习 metadata；变更字段：标题、截止日期");
+    expect(wrapper.text()).not.toContain("title");
+    expect(wrapper.text()).not.toContain("dueDate");
   });
 
   it("metadata 缺失时不会展示 undefined", () => {
