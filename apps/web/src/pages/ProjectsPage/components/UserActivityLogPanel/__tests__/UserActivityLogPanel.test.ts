@@ -28,7 +28,7 @@ describe("UserActivityLogPanel", () => {
       }
     });
 
-    expect(wrapper.text()).toContain("点击加载，查看你最近的所有操作");
+    expect(wrapper.text()).toContain("加载后可以查看你跨 Project 的最近操作");
   });
 
   it("点击加载按钮会 emit loadUserActivityLogs", async () => {
@@ -63,7 +63,7 @@ describe("UserActivityLogPanel", () => {
     expect(wrapper.text()).toContain("正在加载最近操作");
   });
 
-  it("error 状态显示错误信息和重试按钮", async () => {
+  it("error 状态显示友好提示、错误信息和重试按钮", async () => {
     const wrapper = mount(UserActivityLogPanel, {
       props: {
         userActivityLogListState: {
@@ -73,6 +73,7 @@ describe("UserActivityLogPanel", () => {
       }
     });
 
+    expect(wrapper.text()).toContain("最近操作加载失败，可以稍后重试");
     expect(wrapper.text()).toContain("加载最近操作失败");
 
     await wrapper.get("button").trigger("click");
@@ -90,7 +91,8 @@ describe("UserActivityLogPanel", () => {
       }
     });
 
-    expect(wrapper.text()).toContain("你还没有最近操作记录");
+    expect(wrapper.text()).toContain("还没有最近操作");
+    expect(wrapper.text()).toContain("创建 Project 或 Todo 后，这里会显示记录");
   });
 
   it("success 时展示 message、中文 action、Project 快照名和格式化时间", () => {

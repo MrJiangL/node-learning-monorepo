@@ -1,5 +1,5 @@
 import type { ActivityLog } from "@learn/shared";
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { fetchUserActivityLogs } from "../../../api/activity-logs";
 import { getAuthToken } from "../../../auth/token-storage";
 
@@ -11,6 +11,9 @@ export type UserActivityLogListState =
 
 export function useUserActivityLogs() {
   const userActivityLogListState = ref<UserActivityLogListState>({ status: "idle" });
+  const hasLoadedUserActivityLogs = computed(
+    () => userActivityLogListState.value.status !== "idle"
+  );
 
   async function loadUserActivityLogs() {
     const token = getAuthToken();
@@ -42,6 +45,7 @@ export function useUserActivityLogs() {
 
   return {
     userActivityLogListState,
+    hasLoadedUserActivityLogs,
     loadUserActivityLogs
   };
 }

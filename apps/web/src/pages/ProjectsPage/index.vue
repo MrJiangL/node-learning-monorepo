@@ -34,7 +34,19 @@ const selectedProjectId = ref<string | null>(null);
 const savingProjectId = ref<string | null>(null);
 const deletingProjectId = ref<string | null>(null);
 const projectMutationError = ref<string | null>(null);
-const { userActivityLogListState, loadUserActivityLogs } = useUserActivityLogs();
+const { userActivityLogListState, hasLoadedUserActivityLogs, loadUserActivityLogs } =
+  useUserActivityLogs();
+
+async function refreshUserActivityLogsIfLoaded() {
+  // 用户级 Activity Log 是一个“可选的最近动态面板”。
+  //
+  // 首屏不要自动请求它，避免进入 /projects 时多一次附加请求。
+  // 但用户已经手动加载过之后，Project / Todo 操作成功就顺手刷新，
+  // 这样“我的最近操作”会自然跟上页面变化。
+  if (hasLoadedUserActivityLogs.value) {
+    await loadUserActivityLogs();
+  }
+}
 
 async function handleSelectProject(projectId: string) {
   // selectedProjectId 是页面状态。
@@ -52,6 +64,7 @@ async function handleCreateTodo(input: { title: string }) {
   // 所以这里把 selectedProjectId 和表单 input 一起交给 useTodos。
   await createTodoForProject(selectedProjectId.value, input);
   await loadActivityLogs(selectedProjectId.value);
+  await refreshUserActivityLogsIfLoaded();
 }
 
 async function handleToggleTodo(todo: Todo) {
@@ -61,6 +74,7 @@ async function handleToggleTodo(todo: Todo) {
   // 只是把“当前 Project + 当前 Todo”交给 composable。
   await toggleTodo(selectedProjectId.value, todo);
   await loadActivityLogs(selectedProjectId.value);
+  await refreshUserActivityLogsIfLoaded();
 }
 
 async function handleSaveTodo(todoId: string, input: { title: string; dueDate: string | null }) {
@@ -70,6 +84,7 @@ async function handleSaveTodo(todoId: string, input: { title: string; dueDate: s
   // 页面只负责把事件参数转发过去。
   await saveTodo(selectedProjectId.value, todoId, input);
   await loadActivityLogs(selectedProjectId.value);
+  await refreshUserActivityLogsIfLoaded();
 }
 
 async function handleDeleteTodo(todoId: string) {
@@ -78,6 +93,12 @@ async function handleDeleteTodo(todoId: string) {
   // 因为删除成功后 useTodos 会重新加载这个 Project 下的 Todo 列表。
   await deleteTodoFromProject(selectedProjectId.value, todoId);
   await loadActivityLogs(selectedProjectId.value);
+  await refreshUserActivityLogsIfLoaded();
+}
+
+async function handleCreateProject(input: { name: string; description?: string }) {
+  await createProjectFromInput(input);
+  await refreshUserActivityLogsIfLoaded();
 }
 
 async function handleSaveProject(projectId: string, input: { name: string; description?: string }) {
@@ -93,6 +114,7 @@ async function handleSaveProject(projectId: string, input: { name: string; descr
     }
 
     await loadActivityLogs(projectId);
+    await refreshUserActivityLogsIfLoaded();
   } finally {
     savingProjectId.value = null;
   }
@@ -115,6 +137,8 @@ async function handleDeleteProject(projectId: string) {
       resetTodos();
       resetActivityLogs();
     }
+
+    await refreshUserActivityLogsIfLoaded();
   } finally {
     deletingProjectId.value = null;
   }
@@ -140,7 +164,7 @@ async function handleLogout() {
       @load-projects="loadProjects"
       @logout="handleLogout"
       @select-project="handleSelectProject"
-      @create-project="createProjectFromInput"
+      @create-project="handleCreateProject"
       @save-project="handleSaveProject"
       @delete-project="handleDeleteProject"
     />

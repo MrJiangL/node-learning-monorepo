@@ -22,7 +22,10 @@ describe("useUserActivityLogs", () => {
   it("没有 token 时进入错误状态", async () => {
     mockedGetAuthToken.mockReturnValue(null);
 
-    const { userActivityLogListState, loadUserActivityLogs } = useUserActivityLogs();
+    const { userActivityLogListState, hasLoadedUserActivityLogs, loadUserActivityLogs } =
+      useUserActivityLogs();
+
+    expect(hasLoadedUserActivityLogs.value).toBe(false);
 
     await loadUserActivityLogs();
 
@@ -30,6 +33,7 @@ describe("useUserActivityLogs", () => {
       status: "error",
       message: "请先登录，再加载最近操作"
     });
+    expect(hasLoadedUserActivityLogs.value).toBe(true);
     expect(mockedFetchUserActivityLogs).not.toHaveBeenCalled();
   });
 
@@ -58,11 +62,15 @@ describe("useUserActivityLogs", () => {
       }
     });
 
-    const { userActivityLogListState, loadUserActivityLogs } = useUserActivityLogs();
+    const { userActivityLogListState, hasLoadedUserActivityLogs, loadUserActivityLogs } =
+      useUserActivityLogs();
+
+    expect(hasLoadedUserActivityLogs.value).toBe(false);
 
     await loadUserActivityLogs();
 
     expect(mockedFetchUserActivityLogs).toHaveBeenCalledWith("access-token");
+    expect(hasLoadedUserActivityLogs.value).toBe(true);
     expect(userActivityLogListState.value).toEqual({
       status: "success",
       logs: [

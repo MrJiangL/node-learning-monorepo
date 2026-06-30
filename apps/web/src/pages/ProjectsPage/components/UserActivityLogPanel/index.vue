@@ -33,10 +33,13 @@ function formatProjectSnapshotName(log: ActivityLog): string {
       </button>
     </div>
 
-    <p v-if="props.userActivityLogListState.status === 'idle'">点击加载，查看你最近的所有操作。</p>
+    <p v-if="props.userActivityLogListState.status === 'idle'">
+      加载后可以查看你跨 Project 的最近操作。
+    </p>
     <p v-if="props.userActivityLogListState.status === 'loading'">正在加载最近操作...</p>
 
     <div v-if="props.userActivityLogListState.status === 'error'" class="error">
+      <p>最近操作加载失败，可以稍后重试。</p>
       <p>{{ props.userActivityLogListState.message }}</p>
       <button type="button" @click="emit('loadUserActivityLogs')">重试</button>
     </div>
@@ -47,7 +50,7 @@ function formatProjectSnapshotName(log: ActivityLog): string {
         props.userActivityLogListState.logs.length === 0
       "
     >
-      你还没有最近操作记录。
+      还没有最近操作。创建 Project 或 Todo 后，这里会显示记录。
     </p>
 
     <ul v-if="props.userActivityLogListState.status === 'success'" class="activity-log-list">

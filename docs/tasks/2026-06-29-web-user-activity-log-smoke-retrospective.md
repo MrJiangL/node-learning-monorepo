@@ -170,16 +170,31 @@ npm run format:check
 
 ## 完成标准
 
-- [ ] 创建 `docs/reviews/web-user-activity-log-smoke-retrospective.md`
-- [ ] 写清楚 smoke 验证路径
-- [ ] 写清楚用户级 Activity Log 解决的问题
-- [ ] 写清楚它和 Project 级 Activity Log 的分工
-- [ ] 写清楚 Project 删除后日志是否更容易查看
-- [ ] 在 A / B / C 中选择下一阶段
-- [ ] npm run format:check 通过
+- [x] 创建 `docs/reviews/web-user-activity-log-smoke-retrospective.md`
+- [x] 写清楚 smoke 验证路径
+- [x] 写清楚用户级 Activity Log 解决的问题
+- [x] 写清楚它和 Project 级 Activity Log 的分工
+- [x] 写清楚 Project 删除后日志是否更容易查看
+- [x] 在 A / B / C 中选择下一阶段
+- [x] npm run format:check 通过
 
-完成后告诉我：
+## 完成记录
+
+- 完成时间：2026-06-29
+- 复盘文档：`docs/reviews/web-user-activity-log-smoke-retrospective.md`
+- 下一阶段选择：A，部署上线和线上 smoke
+- 选择原因：
+  - 用户级 Activity Log 前端入口已经完成本地 smoke。
+  - 这是一个可见的新前端入口。
+  - 它调用了新加的用户级 API：`GET /activity-logs`。
+  - 下一步应该尽早验证 Netlify 前端到 Railway API 的线上链路。
+- 验证结果：
+  - `npm run format:check` 通过
+
+这张任务已经完成。
+
+下一步看：
 
 ```text
-用户级 Activity Log 前端入口 smoke 复盘完成了，我选 X
+docs/tasks/2026-06-29-web-user-activity-log-online-smoke.md
 ```
