@@ -123,4 +123,39 @@ describe("UserActivityLogPanel", () => {
     expect(wrapper.text()).not.toContain("2026-06-29T11:30:00.000Z");
     expect(wrapper.get("time").attributes("datetime")).toBe("2026-06-29T11:30:00.000Z");
   });
+
+  it("success 时展示 metadata 摘要", () => {
+    const wrapper = mount(UserActivityLogPanel, {
+      props: {
+        userActivityLogListState: {
+          status: "success",
+          logs: [
+            createActivityLog({
+              action: "project.updated",
+              message: "更新了 Project：学习项目",
+              metadata: {
+                projectName: "学习项目",
+                changedFields: ["name", "description"]
+              }
+            })
+          ]
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("Project：学习项目；变更字段：name、description");
+  });
+
+  it("metadata 缺失时不会展示 undefined", () => {
+    const wrapper = mount(UserActivityLogPanel, {
+      props: {
+        userActivityLogListState: {
+          status: "success",
+          logs: [createActivityLog({ metadata: null })]
+        }
+      }
+    });
+
+    expect(wrapper.text()).not.toContain("undefined");
+  });
 });

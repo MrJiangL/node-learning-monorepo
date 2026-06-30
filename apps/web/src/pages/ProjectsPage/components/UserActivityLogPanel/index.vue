@@ -2,6 +2,7 @@
 import type { ActivityLog } from "@learn/shared";
 import {
   formatActivityLogAction,
+  formatActivityLogMetadata,
   formatActivityLogTime
 } from "../ActivityLogPanel/activity-log-display";
 
@@ -56,6 +57,9 @@ function formatProjectSnapshotName(log: ActivityLog): string {
     <ul v-if="props.userActivityLogListState.status === 'success'" class="activity-log-list">
       <li v-for="log in props.userActivityLogListState.logs" :key="log.id">
         <strong>{{ log.message }}</strong>
+        <small v-if="formatActivityLogMetadata(log)">
+          {{ formatActivityLogMetadata(log) }}
+        </small>
         <span>{{ formatActivityLogAction(log.action) }}</span>
         <span>{{ formatProjectSnapshotName(log) }}</span>
         <time :datetime="log.createdAt">{{ formatActivityLogTime(log.createdAt) }}</time>

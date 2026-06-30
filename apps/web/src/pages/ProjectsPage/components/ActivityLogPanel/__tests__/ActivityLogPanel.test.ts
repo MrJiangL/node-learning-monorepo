@@ -103,4 +103,42 @@ describe("ActivityLogPanel", () => {
     expect(wrapper.text()).not.toContain("2026-06-28T11:30:00.000Z");
     expect(wrapper.get("time").attributes("datetime")).toBe("2026-06-28T11:30:00.000Z");
   });
+
+  it("success 时展示 metadata 摘要", () => {
+    const wrapper = mount(ActivityLogPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        activityLogListState: {
+          status: "success",
+          logs: [
+            createActivityLog({
+              action: "todo.updated",
+              message: "更新了 Todo：学习 metadata",
+              metadata: {
+                todoId: "todo-1",
+                title: "学习 metadata",
+                changedFields: ["title", "dueDate"]
+              }
+            })
+          ]
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("Todo：学习 metadata；变更字段：title、dueDate");
+  });
+
+  it("metadata 缺失时不会展示 undefined", () => {
+    const wrapper = mount(ActivityLogPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        activityLogListState: {
+          status: "success",
+          logs: [createActivityLog({ metadata: null })]
+        }
+      }
+    });
+
+    expect(wrapper.text()).not.toContain("undefined");
+  });
 });

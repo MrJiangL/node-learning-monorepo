@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import type { ActivityLog } from "@learn/shared";
-import { formatActivityLogAction, formatActivityLogTime } from "./activity-log-display.ts";
+import {
+  formatActivityLogAction,
+  formatActivityLogMetadata,
+  formatActivityLogTime
+} from "./activity-log-display.ts";
 
 type ActivityLogListState =
   | { status: "idle" }
@@ -51,6 +55,9 @@ const emit = defineEmits<{
     <ul v-if="props.activityLogListState.status === 'success'" class="activity-log-list">
       <li v-for="log in props.activityLogListState.logs" :key="log.id">
         <strong>{{ log.message }}</strong>
+        <small v-if="formatActivityLogMetadata(log)">
+          {{ formatActivityLogMetadata(log) }}
+        </small>
         <span>{{ formatActivityLogAction(log.action) }}</span>
         <time :datetime="log.createdAt">{{ formatActivityLogTime(log.createdAt) }}</time>
       </li>

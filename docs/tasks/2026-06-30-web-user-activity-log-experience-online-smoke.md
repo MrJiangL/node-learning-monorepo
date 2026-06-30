@@ -198,21 +198,42 @@ docs/reviews/web-user-activity-log-experience-online-smoke.md
 
 ## 完成标准
 
-- [ ] 部署前本地验证通过
-- [ ] Netlify 部署成功
-- [ ] 线上 `/projects` 能看到“我的最近操作”
-- [ ] 初始进入页面不会自动请求 `GET /activity-logs`
-- [ ] 点击“加载最近操作”后会请求 `GET /activity-logs`
-- [ ] `GET /activity-logs` 返回 200
-- [ ] Project 或 Todo 操作成功后会自动刷新用户级日志
-- [ ] action 是中文文案
-- [ ] 时间是格式化显示
-- [ ] idle / empty / error 文案是新版文案
-- [ ] 创建 `docs/reviews/web-user-activity-log-experience-online-smoke.md`
-- [ ] npm run format:check 通过
+- [x] 部署前本地验证通过
+- [x] Netlify 部署成功
+- [x] 线上 `/projects` 能看到“我的最近操作”
+- [x] 初始进入页面不会自动请求 `GET /activity-logs`
+- [x] 点击“加载最近操作”后会请求 `GET /activity-logs`
+- [x] `GET /activity-logs` 返回 200
+- [x] Project 或 Todo 操作成功后会自动刷新用户级日志
+- [x] action 是中文文案
+- [x] 时间是格式化显示
+- [x] idle / empty / error 文案是新版文案
+- [x] 创建 `docs/reviews/web-user-activity-log-experience-online-smoke.md`
+- [x] npm run format:check 通过
 
-完成后告诉我：
+## 完成记录
+
+- 完成时间：2026-06-30
+- 线上地址：`https://scintillating-pavlova-dc76e0.netlify.app/projects`
+- 复盘文档：`docs/reviews/web-user-activity-log-experience-online-smoke.md`
+- 验证结论：
+  - 用户级 Activity Log 体验优化已经完成线上 smoke。
+  - 初始进入 `/projects` 不自动请求 `GET /activity-logs`。
+  - 点击“加载最近操作”后，线上可以正常请求用户级 Activity Log。
+  - 用户已经加载过“我的最近操作”后，Project / Todo 操作成功会自动刷新。
+  - 新版 idle / empty / error 文案在线上可用。
+- 下一阶段选择：
+  - Activity Log metadata 前端展示
+- 选择原因：
+  - 用户级 Activity Log 查询、入口、体验优化和线上验证已经闭环。
+  - 后端 metadata 契约已经存在，下一步适合把 metadata 变成前端可读信息。
+- 验证结果：
+  - `npm run format:check` 通过
+
+这张任务已经完成。
+
+下一步看：
 
 ```text
-用户级 Activity Log 体验优化线上 smoke 完成了
+docs/tasks/2026-06-30-web-activity-log-metadata-display.md
 ```
