@@ -10,6 +10,7 @@ function createTodo(overrides: Partial<Todo> = {}): Todo {
     title: "学习 emit",
     description: null,
     completed: false,
+    priority: "medium",
     dueDate: null,
     createdAt: "2026-06-02T00:00:00.000Z",
     updatedAt: "2026-06-02T00:00:00.000Z",
@@ -72,7 +73,7 @@ describe("TodoPanel", () => {
     expect(wrapper.text()).toContain("这个 Project 还没有 Todo");
   });
 
-  it("提交创建表单时会 emit createTodo 事件", async () => {
+  it("提交创建表单时会 emit createTodo 事件并带上 priority", async () => {
     const wrapper = mount(TodoPanel, {
       props: {
         selectedProjectId: "project-1",
@@ -84,6 +85,7 @@ describe("TodoPanel", () => {
     });
 
     await wrapper.get('input[name="todoTitle"]').setValue("学习组件测试");
+    await wrapper.get('select[name="todoPriority"]').setValue("high");
     await wrapper.get("form").trigger("submit");
 
     // 子组件只负责把用户输入整理成事件参数。
@@ -93,7 +95,8 @@ describe("TodoPanel", () => {
     expect(wrapper.emitted("createTodo")).toEqual([
       [
         {
-          title: "学习组件测试"
+          title: "学习组件测试",
+          priority: "high"
         }
       ]
     ]);
@@ -163,7 +166,21 @@ describe("TodoPanel", () => {
     expect(wrapper.text()).toContain("暂无截止日期");
   });
 
-  it("点击编辑时会把 dueDate 填入日期输入框", async () => {
+  it("会展示 Todo priority 中文标签", () => {
+    const wrapper = mount(TodoPanel, {
+      props: {
+        selectedProjectId: "project-1",
+        todoListState: {
+          status: "success",
+          todos: [createTodo({ priority: "high" })]
+        }
+      }
+    });
+
+    expect(wrapper.text()).toContain("优先级：高");
+  });
+
+  it("点击编辑时会把 dueDate 和 priority 填入表单", async () => {
     const wrapper = mount(TodoPanel, {
       props: {
         selectedProjectId: "project-1",
@@ -195,9 +212,13 @@ describe("TodoPanel", () => {
       "value",
       "2026-06-28"
     );
+    expect(wrapper.get('select[name="editingTodoPriority"]').element).toHaveProperty(
+      "value",
+      "medium"
+    );
   });
 
-  it("保存编辑时会 emit saveTodo 事件并带上 title 和 dueDate", async () => {
+  it("保存编辑时会 emit saveTodo 事件并带上 title、dueDate 和 priority", async () => {
     const wrapper = mount(TodoPanel, {
       props: {
         selectedProjectId: "project-1",
@@ -217,6 +238,7 @@ describe("TodoPanel", () => {
     await editButton.trigger("click");
     await wrapper.get('input[name="editingTodoTitle"]').setValue("更新 Todo");
     await wrapper.get('input[name="editingTodoDueDate"]').setValue("2026-07-01");
+    await wrapper.get('select[name="editingTodoPriority"]').setValue("low");
 
     const saveButton = wrapper.findAll("button").find((button) => button.text() === "保存");
 
@@ -231,7 +253,8 @@ describe("TodoPanel", () => {
         "todo-1",
         {
           title: "更新 Todo",
-          dueDate: "2026-07-01"
+          dueDate: "2026-07-01",
+          priority: "low"
         }
       ]
     ]);
@@ -274,7 +297,8 @@ describe("TodoPanel", () => {
         "todo-1",
         {
           title: "学习 emit",
-          dueDate: null
+          dueDate: null,
+          priority: "medium"
         }
       ]
     ]);

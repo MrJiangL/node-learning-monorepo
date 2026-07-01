@@ -9,6 +9,7 @@ export function mapPrismaTodoToTodo(todo: PrismaTodo): Todo {
     title: todo.title,
     description: todo.description,
     completed: todo.completed,
+    priority: todo.priority as Todo["priority"],
     dueDate: todo.dueDate ? todo.dueDate.toISOString() : null,
     createdAt: todo.createdAt.toISOString(),
     updatedAt: todo.updatedAt.toISOString(),

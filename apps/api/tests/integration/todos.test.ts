@@ -50,6 +50,7 @@ describe("todos API", () => {
       title: "Write Todo API",
       description: "Create and list endpoint",
       completed: false,
+      priority: "medium",
       projectId: project.id
     });
 
@@ -67,6 +68,27 @@ describe("todos API", () => {
       pageSize: 10,
       total: 1,
       totalPages: 1
+    });
+  });
+
+  it("创建 Todo 时可以传 priority", async () => {
+    const app = createApp();
+    const auth = await registerAndLogin(app, "todo-priority-create@example.com");
+    const project = await createProject(app, auth.token, "Todo priority project");
+
+    const response = await request(app)
+      .post(`/projects/${project.id}/todos`)
+      .set(authHeader(auth.token))
+      .send({
+        title: "Important API todo",
+        priority: "high"
+      });
+
+    expect(response.status).toBe(201);
+    expect(response.body.data).toMatchObject({
+      title: "Important API todo",
+      priority: "high",
+      projectId: project.id
     });
   });
 
@@ -184,7 +206,7 @@ describe("todos API", () => {
     });
   });
 
-  it("当前用户可以通过 API 更新 todo 的 title 和 dueDate", async () => {
+  it("当前用户可以通过 API 更新 todo 的 title、dueDate 和 priority", async () => {
     const app = createApp();
     const auth = await registerAndLogin(app, "todo-api-update-title-due-date@example.com");
     const project = await createProject(app, auth.token, "Todo API update project");
@@ -197,7 +219,8 @@ describe("todos API", () => {
       .set(authHeader(auth.token))
       .send({
         title: "New API title",
-        dueDate: "2026-06-01"
+        dueDate: "2026-06-01",
+        priority: "high"
       });
 
     expect(response.status).toBe(200);
@@ -205,12 +228,30 @@ describe("todos API", () => {
     expect(response.body.data).toMatchObject({
       id: todo.id,
       title: "New API title",
+      priority: "high",
       projectId: project.id
     });
 
     // API 返回 JSON，没有真正的 Date 类型。
     // dueDate 会以 ISO 字符串返回，所以这里只断言日期部分。
     expect(response.body.data.dueDate).toContain("2026-06-01");
+  });
+
+  it("拒绝非法 todo priority", async () => {
+    const app = createApp();
+    const auth = await registerAndLogin(app, "todo-api-invalid-priority@example.com");
+    const project = await createProject(app, auth.token, "Invalid priority project");
+
+    const response = await request(app)
+      .post(`/projects/${project.id}/todos`)
+      .set(authHeader(auth.token))
+      .send({
+        title: "Invalid priority todo",
+        priority: "urgent"
+      });
+
+    expect(response.status).toBe(400);
+    expect(response.body.error.code).toBe("VALIDATION_ERROR");
   });
 
   it("当前用户可以通过 API 清空 todo 的 dueDate", async () => {

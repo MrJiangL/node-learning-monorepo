@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import type { Todo } from "@learn/shared";
+import type { Todo, TodoPriority } from "@learn/shared";
 
 type TodoListState =
   | { status: "idle" }
@@ -14,16 +14,31 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  createTodo: [input: { title: string }];
+  createTodo: [input: { title: string; priority: TodoPriority }];
   toggleTodo: [todo: Todo];
-  saveTodo: [todoId: string, input: { title: string; dueDate: string | null }];
+  saveTodo: [
+    todoId: string,
+    input: { title: string; dueDate: string | null; priority: TodoPriority }
+  ];
   deleteTodo: [todoId: string];
 }>();
 
+const priorityOptions: { value: TodoPriority; label: string }[] = [
+  { value: "low", label: "低" },
+  { value: "medium", label: "中" },
+  { value: "high", label: "高" }
+];
+
 const todoTitle = ref("");
+const todoPriority = ref<TodoPriority>("medium");
 const editingTodoId = ref<string | null>(null);
 const editingTodoTitle = ref("");
 const editingTodoDueDate = ref("");
+const editingTodoPriority = ref<TodoPriority>("medium");
+
+function formatTodoPriority(priority: TodoPriority): string {
+  return priorityOptions.find((option) => option.value === priority)?.label ?? priority;
+}
 
 function formatTodoDueDate(dueDate: string | null): string {
   if (!dueDate) {
@@ -51,8 +66,9 @@ function handleSubmitCreateTodo() {
   //
   // 真正调用 createTodo API 的逻辑仍然在父组件里，
   // 因为父组件才知道 token、selectedProjectId 和重新加载列表的细节。
-  emit("createTodo", { title });
+  emit("createTodo", { title, priority: todoPriority.value });
   todoTitle.value = "";
+  todoPriority.value = "medium";
 }
 
 function handleStartEditTodo(todo: Todo) {
@@ -61,12 +77,14 @@ function handleStartEditTodo(todo: Todo) {
   editingTodoId.value = todo.id;
   editingTodoTitle.value = todo.title;
   editingTodoDueDate.value = todo.dueDate ? todo.dueDate.slice(0, 10) : "";
+  editingTodoPriority.value = todo.priority;
 }
 
 function handleCancelEditTodo() {
   editingTodoId.value = null;
   editingTodoTitle.value = "";
   editingTodoDueDate.value = "";
+  editingTodoPriority.value = "medium";
 }
 
 function handleSaveTodo(todoId: string) {
@@ -79,7 +97,8 @@ function handleSaveTodo(todoId: string) {
 
   emit("saveTodo", todoId, {
     title,
-    dueDate: editingTodoDueDate.value || null
+    dueDate: editingTodoDueDate.value || null,
+    priority: editingTodoPriority.value
   });
   handleCancelEditTodo();
 }
@@ -95,6 +114,11 @@ function handleSaveTodo(todoId: string) {
 
     <form v-if="props.selectedProjectId" class="todo-form" @submit.prevent="handleSubmitCreateTodo">
       <input v-model="todoTitle" name="todoTitle" type="text" placeholder="Todo title" />
+      <select v-model="todoPriority" name="todoPriority">
+        <option v-for="option in priorityOptions" :key="option.value" :value="option.value">
+          优先级：{{ option.label }}
+        </option>
+      </select>
       <button type="submit">创建 Todo</button>
     </form>
 
@@ -112,11 +136,17 @@ function handleSaveTodo(todoId: string) {
         <div v-if="editingTodoId !== todo.id">
           <strong>{{ todo.title }}</strong>
           <span>{{ todo.completed ? "已完成" : "未完成" }}</span>
+          <span>优先级：{{ formatTodoPriority(todo.priority) }}</span>
           <span>{{ formatTodoDueDate(todo.dueDate) }}</span>
         </div>
 
         <div v-if="editingTodoId === todo.id" class="todo-edit-form">
           <input v-model="editingTodoTitle" name="editingTodoTitle" type="text" />
+          <select v-model="editingTodoPriority" name="editingTodoPriority">
+            <option v-for="option in priorityOptions" :key="option.value" :value="option.value">
+              优先级：{{ option.label }}
+            </option>
+          </select>
           <input v-model="editingTodoDueDate" name="editingTodoDueDate" type="date" />
           <button type="button" @click="handleSaveTodo(todo.id)">保存</button>
           <button type="button" @click="handleCancelEditTodo">取消</button>

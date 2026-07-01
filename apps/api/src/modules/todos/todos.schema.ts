@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { paginationQuerySchema } from "../../http/pagination-query-schema.js";
 
+const todoPrioritySchema = z.enum(["low", "medium", "high"]);
+
 export const createTodoSchema = z.object({
   title: z
     .string()
@@ -12,6 +14,7 @@ export const createTodoSchema = z.object({
     .trim()
     .max(1000, "Description must be 1000 characters or less")
     .optional(),
+  priority: todoPrioritySchema.optional(),
   dueDate: z.string().optional()
 });
 
@@ -27,6 +30,7 @@ export const updateTodoSchema = z.object({
     .trim()
     .max(1000, "Description must be 1000 characters or less")
     .optional(),
+  priority: todoPrioritySchema.optional(),
   dueDate: z.string().nullable().optional(),
   completed: z.boolean().optional()
 });

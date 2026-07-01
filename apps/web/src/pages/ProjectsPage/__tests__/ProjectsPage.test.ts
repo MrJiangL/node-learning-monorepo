@@ -66,6 +66,7 @@ vi.mock("../composables/useTodos", () => ({
           title: "学习自动刷新",
           description: null,
           completed: false,
+          priority: "medium",
           dueDate: null,
           createdAt: "2026-06-29T00:00:00.000Z",
           updatedAt: "2026-06-29T00:00:00.000Z"
@@ -128,9 +129,9 @@ function mountProjectsPage() {
           emits: ["createTodo", "toggleTodo", "saveTodo", "deleteTodo"],
           template: `
             <section>
-              <button type="button" data-test="create-todo" @click="$emit('createTodo', { title: '新 Todo' })">创建 Todo</button>
-              <button type="button" data-test="toggle-todo" @click="$emit('toggleTodo', { id: 'todo-1', projectId: 'project-1', title: '学习自动刷新', description: null, completed: false, dueDate: null, createdAt: '2026-06-29T00:00:00.000Z', updatedAt: '2026-06-29T00:00:00.000Z' })">标记完成</button>
-              <button type="button" data-test="save-todo" @click="$emit('saveTodo', 'todo-1', { title: '更新 Todo', dueDate: null })">保存 Todo</button>
+              <button type="button" data-test="create-todo" @click="$emit('createTodo', { title: '新 Todo', priority: 'medium' })">创建 Todo</button>
+              <button type="button" data-test="toggle-todo" @click="$emit('toggleTodo', { id: 'todo-1', projectId: 'project-1', title: '学习自动刷新', description: null, completed: false, priority: 'medium', dueDate: null, createdAt: '2026-06-29T00:00:00.000Z', updatedAt: '2026-06-29T00:00:00.000Z' })">标记完成</button>
+              <button type="button" data-test="save-todo" @click="$emit('saveTodo', 'todo-1', { title: '更新 Todo', dueDate: null, priority: 'high' })">保存 Todo</button>
               <button type="button" data-test="delete-todo" @click="$emit('deleteTodo', 'todo-1')">删除 Todo</button>
             </section>
           `
@@ -170,7 +171,10 @@ describe("ProjectsPage user activity log refresh", () => {
     await wrapper.get('[data-test="select-project"]').trigger("click");
     await wrapper.get('[data-test="create-todo"]').trigger("click");
 
-    expect(mocks.createTodoForProject).toHaveBeenCalledWith("project-1", { title: "新 Todo" });
+    expect(mocks.createTodoForProject).toHaveBeenCalledWith("project-1", {
+      title: "新 Todo",
+      priority: "medium"
+    });
     expect(mocks.loadUserActivityLogs).not.toHaveBeenCalled();
   });
 
@@ -181,7 +185,10 @@ describe("ProjectsPage user activity log refresh", () => {
     userActivityLogListState.value = { status: "success", logs: [] };
     await wrapper.get('[data-test="create-todo"]').trigger("click");
 
-    expect(mocks.createTodoForProject).toHaveBeenCalledWith("project-1", { title: "新 Todo" });
+    expect(mocks.createTodoForProject).toHaveBeenCalledWith("project-1", {
+      title: "新 Todo",
+      priority: "medium"
+    });
     expect(mocks.loadUserActivityLogs).toHaveBeenCalledTimes(1);
   });
 

@@ -105,6 +105,7 @@ function createFakeProjectRepository(): ProjectRepository & {
         title: todoInput.title,
         description: todoInput.description ?? null,
         completed: false,
+        priority: todoInput.priority ?? "medium",
         dueDate: todoInput.dueDate ?? null,
         createdAt: now,
         updatedAt: now,

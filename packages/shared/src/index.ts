@@ -132,6 +132,8 @@ export type UpdateProjectInput = {
   description?: string;
 };
 
+export type TodoPriority = "low" | "medium" | "high";
+
 // Todo 表示系统返回给客户端的一条任务数据。
 //
 // dueDate 用 string | null，而不是 Date：
@@ -141,6 +143,7 @@ export type Todo = {
   title: string;
   description: string | null;
   completed: boolean;
+  priority: TodoPriority;
   dueDate: string | null;
   createdAt: string;
   updatedAt: string;
@@ -157,6 +160,7 @@ export type Todo = {
 export type CreateTodoInput = {
   title: string;
   description?: string;
+  priority?: TodoPriority;
   dueDate?: string;
 };
 
@@ -167,6 +171,7 @@ export type UpdateTodoInput = {
   title?: string;
   description?: string;
   completed?: boolean;
+  priority?: TodoPriority;
   dueDate?: string | null;
 };
 
@@ -175,7 +180,10 @@ export type UpdateTodoInput = {
 // 它复用了 CreateTodoInput 的字段，而不是重新手写一遍。
 // 这样以后如果 CreateTodoInput 增加 dueDate 之类字段，
 // 这里也能保持类型一致。
-export type InitialTodoInput = Pick<CreateTodoInput, "title" | "description" | "dueDate">;
+export type InitialTodoInput = Pick<
+  CreateTodoInput,
+  "title" | "description" | "priority" | "dueDate"
+>;
 
 // CreateProjectWithTodosInput 表示一个更复杂的创建请求：
 // - Project 的基本字段来自 CreateProjectInput

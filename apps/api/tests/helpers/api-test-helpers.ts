@@ -84,7 +84,7 @@ export async function createTodo(
   token: string,
   projectId: string,
   title: string,
-  input: { dueDate?: string } = {}
+  input: { dueDate?: string; priority?: "low" | "medium" | "high" } = {}
 ) {
   const response = await request(app)
     .post(`/projects/${projectId}/todos`)
@@ -95,6 +95,7 @@ export async function createTodo(
     id: string;
     title: string;
     completed: boolean;
+    priority: "low" | "medium" | "high";
     projectId: string;
   };
 }

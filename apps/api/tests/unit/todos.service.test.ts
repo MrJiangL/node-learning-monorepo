@@ -44,6 +44,7 @@ function createFakeTodoRepository(initialTodos: Todo[] = []): TodoRepository & {
         title: input.title,
         description: input.description ?? null,
         completed: false,
+        priority: input.priority ?? "medium",
         dueDate: input.dueDate ?? null,
         createdAt: now,
         updatedAt: now,
@@ -120,6 +121,7 @@ function createFakeTodoRepository(initialTodos: Todo[] = []): TodoRepository & {
         title: input.title ?? existingTodo.title,
         description: input.description ?? existingTodo.description,
         completed: input.completed ?? existingTodo.completed,
+        priority: input.priority ?? existingTodo.priority,
         dueDate: input.dueDate === undefined ? existingTodo.dueDate : input.dueDate,
 
         updatedAt: new Date().toISOString()
@@ -262,6 +264,7 @@ function createTestTodo(overrides: Partial<Todo> = {}): Todo {
     title: "Test todo",
     description: null,
     completed: false,
+    priority: "medium",
     dueDate: null,
     createdAt: now,
     updatedAt: now,
@@ -293,9 +296,36 @@ describe("todo service 权限规则", () => {
     expect(todo).toMatchObject({
       title: "Write service test",
       completed: false,
+      priority: "medium",
       projectId: "project-1"
     });
     expect(todoRepository.createdProjectIds).toEqual(["project-1"]);
+  });
+
+  it("当前用户创建 Todo 时可以设置 priority", async () => {
+    const project = createTestProject({
+      id: "project-1",
+      userId: "user-1"
+    });
+
+    const projectRepository = createFakeProjectRepository([project]);
+    const todoRepository = createFakeTodoRepository();
+    const service = createTodoService(todoRepository, projectRepository);
+
+    const todo = await service.createTodo(
+      "project-1",
+      {
+        title: "High priority todo",
+        priority: "high"
+      },
+      "user-1"
+    );
+
+    expect(todo).toMatchObject({
+      title: "High priority todo",
+      priority: "high",
+      projectId: "project-1"
+    });
   });
 
   it("不能在别人的 Project 下创建 Todo", async () => {
@@ -413,7 +443,7 @@ describe("todo service 权限规则", () => {
     expect(todoRepository.updatedIds).toEqual([]);
   });
 
-  it("当前用户可以更新自己 todo 的 title 和 dueDate", async () => {
+  it("当前用户可以更新自己 todo 的 title、dueDate 和 priority", async () => {
     const project = createTestProject({
       id: "project-1",
       userId: "user-1"
@@ -434,7 +464,8 @@ describe("todo service 权限规则", () => {
       "todo-1",
       {
         title: "New service title",
-        dueDate: "2026-06-01"
+        dueDate: "2026-06-01",
+        priority: "high"
       },
       "user-1"
     );
@@ -443,6 +474,7 @@ describe("todo service 权限规则", () => {
       id: "todo-1",
       title: "New service title",
       dueDate: "2026-06-01",
+      priority: "high",
       projectId: "project-1"
     });
 

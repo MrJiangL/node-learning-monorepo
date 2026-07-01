@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useTodos } from "../useTodos";
-import { fetchTodos, updateTodo } from "../../../../api/todos";
+import { createTodo, fetchTodos, updateTodo } from "../../../../api/todos";
 import { getAuthToken } from "../../../../auth/token-storage";
 
 // useTodos 依赖 token-storage 判断当前用户是否已登录。
@@ -28,6 +28,7 @@ vi.mock("../../../../api/todos", () => ({
 // 否则 TS 只知道 getAuthToken 是普通函数，
 // 不知道它运行时已经拥有 mockReturnValue 这些测试方法。
 const mockedGetAuthToken = vi.mocked(getAuthToken);
+const mockedCreateTodo = vi.mocked(createTodo);
 const mockedFetchTodos = vi.mocked(fetchTodos);
 const mockedUpdateTodo = vi.mocked(updateTodo);
 
@@ -65,6 +66,7 @@ describe("useTodos", () => {
           title: "学习 composable 测试",
           description: null,
           completed: false,
+          priority: "medium",
           dueDate: null,
           createdAt: "2026-06-02T00:00:00.000Z",
           updatedAt: "2026-06-02T00:00:00.000Z"
@@ -94,6 +96,7 @@ describe("useTodos", () => {
           title: "学习 composable 测试",
           description: null,
           completed: false,
+          priority: "medium",
           dueDate: null,
           createdAt: "2026-06-02T00:00:00.000Z",
           updatedAt: "2026-06-02T00:00:00.000Z"
@@ -125,7 +128,48 @@ describe("useTodos", () => {
     });
   });
 
-  it("保存 Todo 时会调用 updateTodo 并带上 title 和 dueDate", async () => {
+  it("创建 Todo 时会调用 createTodo 并带上 priority", async () => {
+    mockedGetAuthToken.mockReturnValue("test-token");
+    mockedCreateTodo.mockResolvedValue({
+      success: true,
+      data: {
+        id: "todo-1",
+        projectId: "project-1",
+        title: "新 Todo",
+        description: null,
+        completed: false,
+        priority: "high",
+        dueDate: null,
+        createdAt: "2026-06-02T00:00:00.000Z",
+        updatedAt: "2026-06-02T00:00:00.000Z"
+      }
+    });
+    mockedFetchTodos.mockResolvedValue({
+      success: true,
+      data: [],
+      meta: {
+        page: 1,
+        pageSize: 10,
+        total: 0,
+        totalPages: 0
+      }
+    });
+
+    const { createTodoForProject } = useTodos();
+
+    await createTodoForProject("project-1", {
+      title: "新 Todo",
+      priority: "high"
+    });
+
+    expect(mockedCreateTodo).toHaveBeenCalledWith("project-1", "test-token", {
+      title: "新 Todo",
+      priority: "high"
+    });
+    expect(mockedFetchTodos).toHaveBeenCalledWith("project-1", "test-token");
+  });
+
+  it("保存 Todo 时会调用 updateTodo 并带上 title、dueDate 和 priority", async () => {
     mockedGetAuthToken.mockReturnValue("test-token");
     mockedUpdateTodo.mockResolvedValue({
       success: true,
@@ -135,6 +179,7 @@ describe("useTodos", () => {
         title: "更新 Todo",
         description: null,
         completed: false,
+        priority: "high",
         dueDate: "2026-07-01T00:00:00.000Z",
         createdAt: "2026-06-02T00:00:00.000Z",
         updatedAt: "2026-06-28T00:00:00.000Z"
@@ -155,12 +200,14 @@ describe("useTodos", () => {
 
     await saveTodo("project-1", "todo-1", {
       title: "更新 Todo",
-      dueDate: "2026-07-01"
+      dueDate: "2026-07-01",
+      priority: "high"
     });
 
     expect(mockedUpdateTodo).toHaveBeenCalledWith("todo-1", "test-token", {
       title: "更新 Todo",
-      dueDate: "2026-07-01"
+      dueDate: "2026-07-01",
+      priority: "high"
     });
     expect(mockedFetchTodos).toHaveBeenCalledWith("project-1", "test-token");
   });
@@ -175,6 +222,7 @@ describe("useTodos", () => {
         title: "更新 Todo",
         description: null,
         completed: false,
+        priority: "medium",
         dueDate: null,
         createdAt: "2026-06-02T00:00:00.000Z",
         updatedAt: "2026-06-28T00:00:00.000Z"

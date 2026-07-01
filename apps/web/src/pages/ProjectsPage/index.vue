@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Todo } from "@learn/shared";
+import type { Todo, TodoPriority } from "@learn/shared";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { clearAuthToken } from "../../auth/token-storage";
@@ -57,7 +57,7 @@ async function handleSelectProject(projectId: string) {
   await Promise.all([loadTodos(projectId), loadActivityLogs(projectId)]);
 }
 
-async function handleCreateTodo(input: { title: string }) {
+async function handleCreateTodo(input: { title: string; priority: TodoPriority }) {
   // TodoPanel 只知道用户提交了 title。
   //
   // 当前选中的 Project 由页面状态 selectedProjectId 管理，
@@ -77,7 +77,10 @@ async function handleToggleTodo(todo: Todo) {
   await refreshUserActivityLogsIfLoaded();
 }
 
-async function handleSaveTodo(todoId: string, input: { title: string; dueDate: string | null }) {
+async function handleSaveTodo(
+  todoId: string,
+  input: { title: string; dueDate: string | null; priority: TodoPriority }
+) {
   // 编辑 Todo 后仍然重新加载当前 Project 的 Todo 列表。
   //
   // 这件事已经封装在 saveTodo 里，

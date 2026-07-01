@@ -33,6 +33,7 @@ export function createPrismaTodoRepository(): TodoRepository {
           id: crypto.randomUUID(),
           title: input.title,
           description: input.description ?? null,
+          priority: input.priority ?? "medium",
           dueDate: parseOptionalDate(input.dueDate) ?? null,
           projectId
         }

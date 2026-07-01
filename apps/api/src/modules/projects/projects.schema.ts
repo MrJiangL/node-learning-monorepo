@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { paginationQuerySchema } from "../../http/pagination-query-schema.js";
 
+const todoPrioritySchema = z.enum(["low", "medium", "high"]);
+
 // 创建 Project 时，客户端只能提交 name / description。
 //
 // userId 不允许出现在 body 里，因为项目归属必须来自当前登录用户。
@@ -26,6 +28,7 @@ const initialTodoSchema = z.object({
     .trim()
     .max(1000, "Description must be 1000 characters or less")
     .optional(),
+  priority: todoPrioritySchema.optional(),
   dueDate: z.string().optional()
 });
 

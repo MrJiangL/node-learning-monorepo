@@ -15,6 +15,7 @@ const changedFieldLabelMap: Record<string, string> = {
   description: "描述",
   dueDate: "截止日期",
   name: "名称",
+  priority: "优先级",
   title: "标题"
 };
 

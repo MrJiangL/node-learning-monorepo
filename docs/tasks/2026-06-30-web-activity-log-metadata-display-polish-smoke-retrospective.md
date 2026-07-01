@@ -167,15 +167,29 @@ npm run format:check
 
 ## 完成标准
 
-- [ ] 创建 `docs/reviews/web-activity-log-metadata-display-polish-smoke-retrospective.md`
-- [ ] 写清楚 smoke 验证路径
-- [ ] 写清楚中文字段名是否更容易理解
-- [ ] 写清楚 Project 级和用户级展示是否一致
-- [ ] 在 A / B / C 中选择下一阶段
-- [ ] npm run format:check 通过
+- [x] 创建 `docs/reviews/web-activity-log-metadata-display-polish-smoke-retrospective.md`
+- [x] 写清楚 smoke 验证路径
+- [x] 写清楚中文字段名是否更容易理解
+- [x] 写清楚 Project 级和用户级展示是否一致
+- [x] 在 A / B / C 中选择下一阶段
+- [x] npm run format:check 通过
 
-完成后告诉我：
+## 完成记录
+
+- 完成时间：2026-06-30
+- 复盘文档：`docs/reviews/web-activity-log-metadata-display-polish-smoke-retrospective.md`
+- 下一阶段选择：A，Activity Log metadata 展示增强线上 smoke
+- 选择原因：
+  - 这次增强是用户可见的 UI 文案变化。
+  - 本地 smoke 已经确认中文字段名更自然。
+  - 下一步需要确认 Netlify 最新 bundle 在线上也展示中文字段名。
+- 验证结果：
+  - `npm run format:check` 通过
+
+这张任务已经完成。
+
+下一步看：
 
 ```text
-Activity Log metadata 展示增强 smoke 复盘完成了，我选 X
+docs/tasks/2026-06-30-web-activity-log-metadata-display-polish-online-smoke.md
 ```

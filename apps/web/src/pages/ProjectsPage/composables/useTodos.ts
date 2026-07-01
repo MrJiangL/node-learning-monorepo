@@ -1,4 +1,4 @@
-import type { Todo } from "@learn/shared";
+import type { Todo, TodoPriority } from "@learn/shared";
 import { ref } from "vue";
 import { createTodo, deleteTodo, fetchTodos, updateTodo } from "../../../api/todos";
 import { getAuthToken } from "../../../auth/token-storage";
@@ -11,11 +11,13 @@ type TodoListState =
 
 type CreateTodoFormInput = {
   title: string;
+  priority: TodoPriority;
 };
 
 type UpdateTodoFormInput = {
   title: string;
   dueDate?: string | null;
+  priority?: TodoPriority;
 };
 
 export function useTodos() {

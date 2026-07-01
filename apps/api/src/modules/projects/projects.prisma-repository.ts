@@ -69,6 +69,7 @@ export function createPrismaProjectRepository(): ProjectRepository {
                 id: crypto.randomUUID(),
                 title: todo.title,
                 description: todo.description ?? null,
+                priority: todo.priority ?? "medium",
                 dueDate: todo.dueDate ? new Date(todo.dueDate) : null,
                 projectId: project.id
               }

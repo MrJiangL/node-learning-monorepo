@@ -20,6 +20,7 @@ type CreateTodoFactoryInput = {
   title?: string;
   description?: string | null;
   completed?: boolean;
+  priority?: "low" | "medium" | "high";
   dueDate?: Date | null;
 };
 
@@ -92,6 +93,7 @@ export const createFactoryTodo = async (input: CreateTodoFactoryInput) => {
       title: input.title ?? "Factory Todo",
       description: input.description ?? null,
       completed: input.completed ?? false,
+      priority: input.priority ?? "medium",
       dueDate: input.dueDate ?? null
     }
   });
